@@ -1,19 +1,64 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <!--Sizes-->
+    <!--Common units-->
+    <!--https://material.google.com/layout/metrics-keylines.html#metrics-keylines-sizing-by-increments-->
+    <dimen name="markdown_baseline_grid_8">8dp</dimen>
+    <dimen name="touch_space_size_48">48dp</dimen>
+    <dimen name="icon_size_24">24dp</dimen>
+    <dimen name="avatar_size_40">40dp</dimen>
+    <dimen name="button_height_36">36dp</dimen>
+    <dimen name="button_corner_radius_2">2dp</dimen>
 
-    <dimen name="size_small_24">24dp</dimen>
-    <dimen name="size_medium_56">56dp</dimen>
-    <dimen name="size_large_72">72dp</dimen>
+    <!--Phone-->
+    <!--https://material.google.com/layout/metrics-keylines.html#metrics-keylines-keylines-spacing-->
+    <dimen name="phone_height_between_content_areas_8">8dp</dimen>
+    <dimen name="phone_screen_left_and_right_margin_16">16dp</dimen>
+    <dimen name="phone_navdraw_screen_left_and_right_margin_16">16dp</dimen>
+    <dimen name="phone_statusbar_height_24">24dp</dimen>
+    <dimen name="phone_fab_mini_size_40">40p</dimen>
+    <dimen name="phone_toolbar_height_56">56dp</dimen>
+    <dimen name="phone_subtitle_height_48">56dp</dimen>
+    <dimen name="phone_fab_size_56">56p</dimen>
+    <dimen name="phone_navdraw_panel_right_margin_56">56dp</dimen>
+    <dimen name="phone_icon_avatar_left_margin_72">72dp</dimen>
+    <dimen name="phone_list_item_height_72">72dp</dimen>
 
-    <!--Spaces-->
-    <dimen name="spacing_small_8">8dp</dimen>
-    <dimen name="spacing_normal_16">16dp</dimen>
-    <dimen name="spacing_medial_24">24dp</dimen>
-    <dimen name="spacing_medium_32">32dp</dimen>
-    <dimen name="spacing_large_56">56dp</dimen>
-    <dimen name="spacing_larger_72">72dp</dimen>
+    <!--Tablet-->
+    <!--https://material.google.com/layout/metrics-keylines.html#metrics-keylines-keylines-spacing-->
+    <dimen name="tablet_height_between_content_areas_8">8dp</dimen>
+    <dimen name="tablet_screen_left_and_right_margin_24">24dp</dimen>
+    <dimen name="tablet_card_left_and_right_padding_24">24dp</dimen>
+    <dimen name="tablet_statusbar_height_24">24dp</dimen>
+    <dimen name="tablet_icons_align_from_left_edge_52">52dp</dimen>
+    <dimen name="tablet_left_panel_list_item_height_64">64dp</dimen>
+    <dimen name="tablet_toolbar_height_64">64dp</dimen>
+    <dimen name="tablet_list_item_height_72">72dp</dimen>
+    <dimen name="tablet_content_left_padding_80">80dp</dimen>
+    <dimen name="tablet_title_height_80">80dp</dimen>
+
+    <dimen name="tablet_navdraw_screen_left_and_right_margin_24">24dp</dimen>
+    <dimen name="tablet_fab_mini_size_40">40p</dimen>
+    <dimen name="tablet_fab_size_56">56p</dimen>
+    <dimen name="tablet_subtitle_height_48">56dp</dimen>
+    <dimen name="tablet_slider_height_48">56dp</dimen>
+
+    <!--Text-->
+    <!--https://material.google.com/style/typography.html#-->
+    <dimen name="text_baseline_grid_4dp">4dp</dimen>
+    <dimen name="text_caption_size_12">12sp</dimen>
+    <dimen name="text_button_size_14">14sp</dimen>
+    <dimen name="text_body1_size_14">14sp</dimen>
+    <dimen name="text_subheading_size_16">16sp</dimen>
+    <dimen name="text_title_size_20">20sp</dimen>
+    <dimen name="text_headline_size_24">24sp</dimen>
+
+    <!--Ratio keylines-->
+    <!--https://material.google.com/layout/metrics-keylines.html#metrics-keylines-keylines-spacing-->
+    <dimen name="ratio_w_h_16x9">1.778</dimen>
+    <dimen name="ratio_w_h_3x2">1.5</dimen>
+    <dimen name="ratio_w_h_4x3">1.333</dimen>
+    <dimen name="ratio_w_h_1x1">1</dimen>
+    <dimen name="ratio_w_h_3x4">0.75</dimen>
+    <dimen name="ratio_w_h_2x3">0.6667</dimen>
+
 </resources>
