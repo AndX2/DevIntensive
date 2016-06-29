@@ -1,11 +1,8 @@
-package com.softdesign.devintensive.ui.utils;
+package com.softdesign.devintensive.utils;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 /**
  * Created by savos on 29.06.2016.

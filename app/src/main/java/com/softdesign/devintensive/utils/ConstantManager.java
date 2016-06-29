@@ -1,4 +1,4 @@
-package com.softdesign.devintensive.ui.utils;
+package com.softdesign.devintensive.utils;
 
 /**
  * Created by savos on 22.06.2016.

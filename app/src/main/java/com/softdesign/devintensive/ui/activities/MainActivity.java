@@ -15,11 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.ui.utils.ConstantManager;
+import com.softdesign.devintensive.utils.ConstantManager;
 
 import java.util.ArrayList;
 import java.util.List;
