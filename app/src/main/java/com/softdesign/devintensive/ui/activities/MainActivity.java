@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
@@ -37,6 +40,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private DrawerLayout mNavigationDrawer;
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserMySelf;
+    private ImageView drawerAvatar;
 
     private List<EditText> mUserInfo;
 
@@ -51,6 +55,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         setupToolbar();
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         setupDrawer();
+
 
         mDataManager = DataManager.getInstance();
 
@@ -68,6 +73,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mUserInfo.add(mUserVK);
         mUserInfo.add(mUserGit);
         mUserInfo.add(mUserMySelf);
+
 
         if (savedInstanceState == null) {
             showSnackbar("Activity start is first");
@@ -98,6 +104,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     protected void onResume() {
         super.onResume();
         Log.d(ConstantManager.TAG_PREFIX, "onResume");
+
     }
 
     @Override
@@ -150,7 +157,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (mNavigationDrawer.isDrawerOpen(GravityCompat.START)) {
+            mNavigationDrawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
