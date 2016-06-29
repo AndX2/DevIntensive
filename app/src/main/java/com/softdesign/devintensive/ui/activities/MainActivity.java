@@ -37,10 +37,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private DrawerLayout mNavigationDrawer;
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserMySelf;
-    private ImageView drawerAvatar;
 
     private List<EditText> mUserInfo;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
