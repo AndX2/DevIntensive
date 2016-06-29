@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="icon">
+        <item name="android:layout_width">@dimen/icon_size_24</item>
+        <item name="android:layout_height">@dimen/icon_size_24</item>
+    </style>
+
+    <style name="icon.left">
+        <item name="android:layout_gravity">top|left</item>
+        <item name="android:layout_marginTop">@dimen/phone_icon_top_bottom_margin_24</item>
+        <item name="android:layout_marginLeft">@dimen/phone_screen_left_and_right_margin_16</item>
+        <item name="android:layout_marginRight">@dimen/phone_right_content_margin_32</item>
+    </style>
+
+    <style name="icon.right">
+        <item name="android:layout_gravity">top|left</item>
+        <item name="android:layout_marginTop">@dimen/phone_icon_top_bottom_margin_24</item>
+        <item name="android:layout_marginLeft">@dimen/phone_icon_top_bottom_margin_24</item>
+        <item name="android:layout_marginRight">@dimen/phone_right_content_margin_32</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+</resources>

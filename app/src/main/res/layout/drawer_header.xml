@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="172dp"
+                android:paddingTop="@dimen/phone_statusbar_height_24"
+                android:paddingLeft="@dimen/phone_navdraw_screen_left_and_right_margin_16"
+                android:paddingRight="@dimen/phone_navdraw_screen_left_and_right_margin_16"
+                android:background="@color/grey">
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Макеев Михаил"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_body1_size_14"
+            android:fontFamily="sans-serif-medium"/>
+
+        <TextView
+            android:id="@+id/tv_user_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mail@stub.ru"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_body1_size_14"
+            android:fontFamily="sans-serif"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
