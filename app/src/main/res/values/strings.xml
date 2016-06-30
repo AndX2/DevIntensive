@@ -15,4 +15,5 @@
     <string name="capture_ratio">Рейтинг</string>
     <string name="caption_write_code">Написано строк кода</string>
     <string name="caption_projects">Проектов</string>
+    <string name="pick_image">Выберите изображение</string>
 </resources>

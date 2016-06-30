@@ -1,5 +1,8 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -15,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
@@ -32,8 +36,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private int mCurrentEditMode = 0;
 
     private CoordinatorLayout mCoordinatorLayout;
+    private CollapsingToolbarLayout mToolbarLayout;
+    private AppBarLayout.LayoutParams mAppbarParams = null;
     private Toolbar mToolbar;
     private DrawerLayout mNavigationDrawer;
+    private LinearLayout mProfilePhotoPlaceholder;
+
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserMySelf;
 
@@ -45,10 +53,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.container_main);
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+        mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setupToolbar();
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         setupDrawer();
+        mProfilePhotoPlaceholder = (LinearLayout) findViewById(R.id.photo_placeholder);
 
 
         mDataManager = DataManager.getInstance();
@@ -158,6 +169,18 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    /**
+     * Receive result from another activities (camera's photo or gallery)
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -171,12 +194,16 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                     changeEditMode(0);
                 }
                 break;
+            case R.id.photo_placeholder:
+
+                break;
         }
     }
 
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
+        mAppbarParams = (AppBarLayout.LayoutParams) mToolbarLayout.getLayoutParams();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -206,6 +233,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 userValue.setFocusable(true);
                 userValue.setFocusableInTouchMode(true);
             }
+            mProfilePhotoPlaceholder.setVisibility(VISIBLE);
+            mUserInfo.get(0).requestFocus();
+            mAppbarParams.setScrollFlags(0);
+            mToolbarLayout.setLayoutParams(mAppbarParams);
         } else {
             saveUserInfoValues();
             mFab.setImageResource(R.drawable.ic_edit_black_24dp);
@@ -214,6 +245,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 userValue.setFocusable(false);
                 userValue.setFocusableInTouchMode(false);
             }
+            mProfilePhotoPlaceholder.setVisibility(GONE);
+            mAppbarParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
+                    AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED);
+            mToolbarLayout.setLayoutParams(mAppbarParams);
         }
 
 
@@ -224,8 +259,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         for (int i = 0; i < userData.size(); i++) {
             mUserInfo.get(i).setText(userData.get(i));
         }
-
-
     }
 
     private void saveUserInfoValues() {
@@ -234,6 +267,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             userData.add(userFieldView.getText().toString());
         }
         mDataManager.getPreferenceManager().saveUserProfileData(userData);
+    }
+
+    private void loadPhotoFromGalery() {
+
+    }
+
+    private void loadPhotoFromCamera() {
 
     }
 
