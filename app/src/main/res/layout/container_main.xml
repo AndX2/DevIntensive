@@ -198,6 +198,8 @@
 
         </android.support.design.widget.FloatingActionButton>
 
+        <include layout="@layout/bottom_sheet_pick_user_photo"/>
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView

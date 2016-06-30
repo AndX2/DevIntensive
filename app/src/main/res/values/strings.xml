@@ -16,4 +16,5 @@
     <string name="caption_write_code">Написано строк кода</string>
     <string name="caption_projects">Проектов</string>
     <string name="pick_image">Выберите изображение</string>
+    <string name="pick_photo_src">Выберите источник изображения</string>
 </resources>

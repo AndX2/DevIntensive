@@ -1,7 +1,9 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -41,6 +43,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private Toolbar mToolbar;
     private DrawerLayout mNavigationDrawer;
     private LinearLayout mProfilePhotoPlaceholder;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    View mAddPhotoCamera, mAddPhotoGallery;
 
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserMySelf;
@@ -60,6 +64,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         setupDrawer();
         mProfilePhotoPlaceholder = (LinearLayout) findViewById(R.id.photo_placeholder);
+        mProfilePhotoPlaceholder.setOnClickListener(this);
+        mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheetLayout));
+        mAddPhotoCamera = findViewById(R.id.ll_add_photo_from_camera);
+        mAddPhotoCamera.setOnClickListener(this);
+        mAddPhotoGallery = findViewById(R.id.ll_add_photo_from_gallery);
+        mAddPhotoGallery.setOnClickListener(this);
 
 
         mDataManager = DataManager.getInstance();
@@ -162,8 +172,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onBackPressed() {
-        if (mNavigationDrawer.isDrawerOpen(GravityCompat.START)) {
+        if (mNavigationDrawer.isDrawerOpen(GravityCompat.START) ||
+                (mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED)) {
             mNavigationDrawer.closeDrawer(GravityCompat.START);
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
             super.onBackPressed();
         }
@@ -195,7 +207,22 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 }
                 break;
             case R.id.photo_placeholder:
-
+                //showSnackbar("Placeholder onClick");
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    }
+                }, ConstantManager.ACTIVITY_MAIN_TIME_SHOW_BOTTOM_SHEET_PICK_PHOTO);
+                break;
+            case R.id.ll_add_photo_from_camera:
+                //showSnackbar("loadFromCamera onClick");
+                loadPhotoFromCamera();
+                break;
+            case R.id.ll_add_photo_from_gallery:
+                loadPhotoFromGalery();
                 break;
         }
     }
@@ -249,6 +276,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mAppbarParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
                     AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED);
             mToolbarLayout.setLayoutParams(mAppbarParams);
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
 
 

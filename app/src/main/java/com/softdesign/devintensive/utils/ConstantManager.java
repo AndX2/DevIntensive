@@ -6,6 +6,7 @@ package com.softdesign.devintensive.utils;
 
 public interface ConstantManager {
 
+
     String TAG_PREFIX = "Main activity";
     String COLOR_MODE_KEY = "Color mode key";
     String EDIT_MODE_KEY = "Edit text key";
@@ -17,4 +18,5 @@ public interface ConstantManager {
     String USER_MYSELF_KEY = "User_key_5";
 
 
+    long ACTIVITY_MAIN_TIME_SHOW_BOTTOM_SHEET_PICK_PHOTO = 3000;
 }
