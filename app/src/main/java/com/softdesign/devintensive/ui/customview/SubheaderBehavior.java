@@ -26,9 +26,9 @@ public class SubheaderBehavior extends CoordinatorLayout.Behavior<LinearLayout> 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, LinearLayout child, View dependency) {
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) child.getLayoutParams();
-        int pxindp = TypedValue.COMPLEX_UNIT_DIP;
+        int pxindp = TypedValue.COMPLEX_RADIX_8p15; //COMPLEX_UNIT_DIP;
         if (dependency.getY() >= (72 + 64 + 24) * pxindp)
-            lp.height = (int) (dependency.getY()) * 72 / (160) * pxindp;
+            lp.height = (int) (dependency.getY()) * 64 / (300) * pxindp;
         dependency.setPadding(dependency.getPaddingLeft(), lp.height, dependency.getPaddingRight(), dependency.getPaddingBottom());
         child.setY(dependency.getY());
         child.setLayoutParams(lp);
