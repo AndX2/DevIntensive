@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -221,11 +222,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 showSnackbar("handle Camera");
                 if (mPhotoFile != null){
                     mSelectedImageUri = Uri.fromFile(mPhotoFile);
-                    mDataManager.getPreferenceManager().saveUserPhoto(mSelectedImageUri);
                     insertImage(mSelectedImageUri);
                 }
                 break;
             case REQUEST_CODE_GALLERY_PICTURE:
+                Log.d("sadbfsdaf", data.getData().toString());
+                insertImage(Uri.parse(data.getData().toString()));
                 break;
         }
     }
@@ -372,7 +374,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 startActivityForResult(takePhotoFromCamera, ConstantManager.REQUEST_CODE_CAMERA_PICTURE);
 
             }else {
-                Log.d("sdnfa", "request permition");
+                Log.d("sdnfa", "request permission");
                 ActivityCompat.requestPermissions(this, new String[]{
                         Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         ConstantManager.CAMERA_PERMISSION_REQUEST_CODE);
@@ -392,11 +394,23 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "Image_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(imageFileName, ".jpg", storageDir);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+        /**
+         * Inserting created photo to System media library for show Gallery
+         */
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, image.getAbsolutePath());
+        this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        return image;
     }
 
     private void insertImage(Uri selectedImageUri) {
-        showSnackbar("insertImage" + selectedImageUri);
+        //showSnackbar("insertImage" + selectedImageUri);
+        mDataManager.getPreferenceManager().saveUserPhoto(selectedImageUri);
         Picasso.with(this)
                 .load(selectedImageUri)
                 .into(mUserProfilePhoto);

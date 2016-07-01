@@ -17,5 +17,5 @@
     <string name="caption_projects">Проектов</string>
     <string name="pick_image">Выберите изображение</string>
     <string name="pick_photo_src">Выберите источник изображения</string>
-    <string name="pick_image_from_gallery">Выбурите фото</string>
+    <string name="pick_image_from_gallery">Выберите фото</string>
 </resources>
