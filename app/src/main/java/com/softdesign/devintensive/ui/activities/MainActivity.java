@@ -1,7 +1,14 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -9,6 +16,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -20,16 +29,23 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.support.design.widget.NavigationView.*;
+import static com.softdesign.devintensive.utils.ConstantManager.*;
 
 
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -45,11 +61,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private LinearLayout mProfilePhotoPlaceholder;
     private BottomSheetBehavior mBottomSheetBehavior;
     View mAddPhotoCamera, mAddPhotoGallery;
+    ImageView mUserProfilePhoto;
 
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserMySelf;
 
     private List<EditText> mUserInfo;
+    File mPhotoFile = null;
+    private Uri mSelectedImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +89,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mAddPhotoCamera.setOnClickListener(this);
         mAddPhotoGallery = findViewById(R.id.ll_add_photo_from_gallery);
         mAddPhotoGallery.setOnClickListener(this);
-
+        mUserProfilePhoto = (ImageView)findViewById(R.id.user_profile_placeholder_image);
 
         mDataManager = DataManager.getInstance();
 
@@ -99,6 +118,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
         loadUserInfoValues();
+
+        Picasso.with(this)
+                .load(mDataManager.getPreferenceManager().loadUserPhoto())
+                .into(mUserProfilePhoto);
+
 
 
     }
@@ -190,7 +214,33 @@ public class MainActivity extends BaseActivity implements OnClickListener {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //showSnackbar("onActivityResult  " + (resultCode == RESULT_OK) + " " + (data != null));
+        if ((resultCode != RESULT_OK)) return;
+        switch (requestCode){
+            case REQUEST_CODE_CAMERA_PICTURE:
+                showSnackbar("handle Camera");
+                if (mPhotoFile != null){
+                    mSelectedImageUri = Uri.fromFile(mPhotoFile);
+                    mDataManager.getPreferenceManager().saveUserPhoto(mSelectedImageUri);
+                    insertImage(mSelectedImageUri);
+                }
+                break;
+            case REQUEST_CODE_GALLERY_PICTURE:
+                break;
+        }
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case CAMERA_PERMISSION_REQUEST_CODE:
+                if((grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    && (grantResults[1] == PackageManager.PERMISSION_GRANTED)){
+                    loadPhotoFromCamera();
+            }
+                break;
+        }
     }
 
     @Override
@@ -222,7 +272,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 loadPhotoFromCamera();
                 break;
             case R.id.ll_add_photo_from_gallery:
-                loadPhotoFromGalery();
+                loadPhotoFromGallery();
                 break;
         }
     }
@@ -297,13 +347,70 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mDataManager.getPreferenceManager().saveUserProfileData(userData);
     }
 
-    private void loadPhotoFromGalery() {
+    private void loadPhotoFromGallery() {
+        Intent takePhotoFromGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        takePhotoFromGallery.setType("image/*");
+        startActivityForResult(Intent.createChooser(takePhotoFromGallery, getString(R.string.pick_image_from_gallery)),
+                ConstantManager.REQUEST_CODE_GALLERY_PICTURE);
 
     }
 
     private void loadPhotoFromCamera() {
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED)){
+            Intent takePhotoFromCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            try{
+                mPhotoFile = createImageFile();
+            }catch (IOException e){
+                e.printStackTrace();
+                //TODO: handle error create file
+            }
+            if (mPhotoFile != null){
+                takePhotoFromCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
+                startActivityForResult(takePhotoFromCamera, ConstantManager.REQUEST_CODE_CAMERA_PICTURE);
+
+            }else {
+                Log.d("sdnfa", "request permition");
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        ConstantManager.CAMERA_PERMISSION_REQUEST_CODE);
+            }
+            Snackbar.make(mCoordinatorLayout, "Дла корректной работы необходимо дать разрешение", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Разрешить", new OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            openApplicationSetting();
+                        }
+                    }).show();
+        }
 
     }
+
+    private File createImageFile() throws IOException{
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "Image_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(imageFileName, ".jpg", storageDir);
+    }
+
+    private void insertImage(Uri selectedImageUri) {
+        showSnackbar("insertImage" + selectedImageUri);
+        Picasso.with(this)
+                .load(selectedImageUri)
+                .into(mUserProfilePhoto);
+    }
+
+    public void openApplicationSetting(){
+        Intent appSettingIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + getPackageName()));
+        startActivityForResult(appSettingIntent, ConstantManager.PERMISSION_REQUEST_SETTING_CODE);
+    }
+
+
+
+
 
 
 }
