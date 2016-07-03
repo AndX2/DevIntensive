@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_auth_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_bg"
+    android:gravity="center"
+    tools:context="com.softdesign.devintensive.ui.activities.AuthActivity">
+
+    <android.support.v7.widget.CardView
+
+        android:id="@+id/card_auth"
+        style="@style/CardView.Light"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="72dp"
+        android:background="@color/white"
+        android:elevation="5dp"
+        app:cardCornerRadius="@dimen/button_corner_radius_2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/phone_icon_top_bottom_margin_24">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/enter_capture"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/text_title_size_20"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16">
+
+                <EditText
+                    android:id="@+id/et_email_auth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="@string/e_mail_hint"
+                    android:inputType="textEmailAddress"
+                    android:text="sadf@sdf.ru"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/grey"
+                    android:textSize="@dimen/text_body1_size_14"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16">
+
+                <EditText
+                    android:id="@+id/et_pass_auth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="@string/hint_pass"
+                    android:inputType="textPassword"
+                    android:text="@string/forgot_pass_capture"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/grey"
+                    android:textSize="@dimen/text_body1_size_14"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_auth"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16"
+                style="@style/ripple"
+                android:text="@string/enter_capture"
+                android:textColor="@color/white"
+                />
+
+            <TextView
+                android:id="@+id/tv_forgot_pass"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16"
+                android:text="@string/forgot_pass_capture"/>
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
