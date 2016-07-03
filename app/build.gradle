@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: "android-aspectj"
 
 android {
     compileSdkVersion 24
@@ -21,6 +22,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.vicmikhailau:MaskedEditText:1.1.0'
+    compile 'org.aspectj:aspectjrt:1.8.+'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.android.support:design:24.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
