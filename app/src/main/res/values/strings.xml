@@ -18,4 +18,10 @@
     <string name="pick_image">Выберите изображение</string>
     <string name="pick_photo_src">Выберите источник изображения</string>
     <string name="pick_image_from_gallery">Выберите фото</string>
+    <string name="error_email_value_message">Ошибка в поле электронной почты</string>
+    <string name="hint_pass">Пароль</string>
+    <string name="enter_capture">ВОЙТИ</string>
+    <string name="forgot_pass_capture">Забыли пароль?</string>
+    <string name="title_send_sms_per_app">Send email per...</string>
+    <string name="error_no_email_client">NO email client installed</string>
 </resources>

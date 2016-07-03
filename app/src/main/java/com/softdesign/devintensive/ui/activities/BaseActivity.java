@@ -12,4 +12,6 @@ import com.softdesign.devintensive.utils.ConstantManager;
 public class BaseActivity extends AppCompatActivity {
     static final String TAG = ConstantManager.TAG_PREFIX + "BaseActivity";
 
+
+
 }
