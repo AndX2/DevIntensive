@@ -212,6 +212,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    /**
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -220,6 +225,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 if ((grantResults[0] == PackageManager.PERMISSION_GRANTED)
                         && (grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
                     loadPhotoFromCamera();
+                } else {
+                    Snackbar.make(mCoordinatorLayout, "Дла корректной работы необходимо дать разрешение", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Разрешить", new OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    openApplicationSetting();
+                                }
+                            }).show();
                 }
                 break;
         }
@@ -248,9 +261,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 }, ConstantManager.ACTIVITY_MAIN_TIME_SHOW_BOTTOM_SHEET_PICK_PHOTO);
                 break;
             case R.id.ll_add_photo_from_camera:
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 loadPhotoFromCamera();
                 break;
             case R.id.ll_add_photo_from_gallery:
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 loadPhotoFromGallery();
                 break;
         }
@@ -376,22 +391,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             if (mPhotoFile != null) {
                 takePhotoFromCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
                 startActivityForResult(takePhotoFromCamera, ConstantManager.REQUEST_CODE_CAMERA_PICTURE);
-
-            } else {
-                Log.d("sdnfa", "request permission");
-                ActivityCompat.requestPermissions(this, new String[]{
-                                Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        ConstantManager.CAMERA_PERMISSION_REQUEST_CODE);
             }
-            Snackbar.make(mCoordinatorLayout, "Дла корректной работы необходимо дать разрешение", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Разрешить", new OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            openApplicationSetting();
-                        }
-                    }).show();
+        } else {
+            Log.d(ConstantManager.TAG_PREFIX, "request permission");
+            ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    ConstantManager.CAMERA_PERMISSION_REQUEST_CODE);
         }
-
     }
 
     private File createImageFile() throws IOException {
@@ -427,18 +433,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private void actionDial(String number) {
-        Intent intent = new Intent(Intent.ACTION_CALL);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number));
         intent.setData(Uri.parse("tel:" + number));
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
         startActivity(intent);
     }
 
@@ -461,13 +457,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipientAdress});
         try {
             startActivity(Intent.createChooser(intent, getString(R.string.title_send_sms_per_app)));
-        }catch (android.content.ActivityNotFoundException ex) {
+        } catch (android.content.ActivityNotFoundException ex) {
             showSnackbar(getString(R.string.error_no_email_client));
         }
 
 
     }
-
 
 
 }

@@ -8,4 +8,6 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="color_transient">#00000000</color>
+    <color name="opacity50">#80000000</color>
+    <color name="opacity25">#B0000000</color>
 </resources>

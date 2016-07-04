@@ -24,4 +24,6 @@
     <string name="forgot_pass_capture">Забыли пароль?</string>
     <string name="title_send_sms_per_app">Send email per...</string>
     <string name="error_no_email_client">NO email client installed</string>
+    <string name="camera">CAMERA</string>
+    <string name="gallery">GALLERY</string>
 </resources>

@@ -3,8 +3,8 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:id="@+id/bottomSheetLayout"
               android:layout_width="match_parent"
-              android:layout_height="112dp"
-              android:background="@color/grey"
+              android:layout_height="172dp"
+              android:background="@drawable/nav_header_bg"
               android:gravity="center_horizontal"
               android:orientation="vertical"
               android:paddingTop="@dimen/phone_screen_left_and_right_margin_16"
@@ -18,8 +18,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
-        android:textSize="@dimen/text_body1_size_14"
+        android:textSize="@dimen/text_subheading_size_16"
         android:text="@string/pick_photo_src"
+        android:textColor="@color/white"
         />
 
     <LinearLayout
@@ -43,7 +44,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="@dimen/text_body1_size_14"
-                android:text="CAMERA"
+                android:text="@string/camera"
+                android:textColor="@color/white"
                 />
 
             <ImageView
@@ -68,7 +70,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="@dimen/text_body1_size_14"
-                android:text="GALLERY"
+                android:text="@string/gallery"
+                android:textColor="@color/white"
                 />
 
             <ImageView
