@@ -3,6 +3,7 @@ package com.softdesign.devintensive.data.managers;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
+import com.softdesign.devintensive.pojo.VKAuth;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.DevIntensiveApplication;
 
@@ -51,6 +52,20 @@ public class PreferenceManager {
     public Uri loadUserPhoto(){
         return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY,
                 "android.resource://com.softdesign.devintensive/drawable/user_avatar"));
-
     }
+
+    public void saveVKAuth(VKAuth vkAuth){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.VK_ID, vkAuth.getVkId());
+        editor.putString(ConstantManager.VK_TOKEN, vkAuth.getAccessToken());
+        editor.apply();
+    }
+
+    public VKAuth loadVKAuth(){
+        if (mSharedPreferences.getString(ConstantManager.VK_TOKEN, null) != null)
+            return new VKAuth(mSharedPreferences.getString(ConstantManager.VK_ID, null),
+                    mSharedPreferences.getString(ConstantManager.VK_TOKEN, null));
+        return null;
+    }
+
 }

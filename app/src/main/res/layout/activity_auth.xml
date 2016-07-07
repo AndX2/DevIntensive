@@ -27,20 +27,38 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="@dimen/phone_icon_top_bottom_margin_24">
+            android:paddingTop="@dimen/phone_icon_top_bottom_margin_24"
+            android:paddingBottom="@dimen/phone_icon_top_bottom_margin_24">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/enter_capture"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/text_title_size_20"/>
+                android:orientation="horizontal">
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorAccent">
+
+                </View>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/enter_capture"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="@dimen/text_title_size_20"/>
+
+            </LinearLayout>
+
+
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16">
+                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16"
+                android:layout_marginLeft="@dimen/phone_icon_top_bottom_margin_24"
+                android:layout_marginRight="@dimen/phone_icon_top_bottom_margin_24">
 
                 <EditText
                     android:id="@+id/et_email_auth"
@@ -60,6 +78,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/phone_icon_top_bottom_margin_24"
+                android:layout_marginRight="@dimen/phone_icon_top_bottom_margin_24">
                 android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16">
 
                 <EditText
@@ -94,6 +114,33 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16"
                 android:text="@string/forgot_pass_capture"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16">
+                <ImageView
+                    android:id="@+id/iv_vk_auth"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_vk_social_network_logo"/>
+                <View
+                    android:layout_width="@dimen/phone_screen_left_and_right_margin_16"
+                    android:layout_height="@dimen/icon_size_24">
+
+                </View>
+
+                <ImageView
+                    android:id="@+id/iv_git_auth"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_github_logo_black_shape"/>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
