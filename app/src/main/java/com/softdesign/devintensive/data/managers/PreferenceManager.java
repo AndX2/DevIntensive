@@ -43,29 +43,39 @@ public class PreferenceManager {
         return userFields;
     }
 
-    public void saveUserPhoto(Uri savedPhotoUri){
+    public void saveUserPhoto(Uri savedPhotoUri) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_PHOTO_KEY, savedPhotoUri.toString());
         editor.apply();
     }
 
-    public Uri loadUserPhoto(){
+    public Uri loadUserPhoto() {
         return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY,
                 "android.resource://com.softdesign.devintensive/drawable/user_avatar"));
     }
 
-    public void saveVKAuth(VKAuth vkAuth){
+    public void saveVKAuth(VKAuth vkAuth) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.VK_ID, vkAuth.getVkId());
         editor.putString(ConstantManager.VK_TOKEN, vkAuth.getAccessToken());
         editor.apply();
     }
 
-    public VKAuth loadVKAuth(){
+    public VKAuth loadVKAuth() {
         if (mSharedPreferences.getString(ConstantManager.VK_TOKEN, null) != null)
             return new VKAuth(mSharedPreferences.getString(ConstantManager.VK_ID, null),
                     mSharedPreferences.getString(ConstantManager.VK_TOKEN, null));
         return null;
+    }
+
+    public void saveGitAuth(String gitToken) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.GIT_AUTH_TOKEN, gitToken);
+        editor.apply();
+    }
+
+    public String loadGitAuth() {
+        return mSharedPreferences.getString(ConstantManager.GIT_AUTH_TOKEN, null);
     }
 
 }

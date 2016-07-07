@@ -14,6 +14,7 @@ public interface ConstantManager {
     String USER_MYSELF_KEY = "User_key_5";
     String VK_ID = "User_key_6";
     String VK_TOKEN = "User_key_7";
+    String GIT_AUTH_TOKEN = "User_key_8";
 
     //MainActivity
     String TAG_PREFIX = "Main activity";
@@ -30,4 +31,5 @@ public interface ConstantManager {
     //VKAuthActivity
     String VK_APP_ID = "5535159";
     String GIT_APP_ID = "47ea27470ddeb8dd366f";
+
 }
