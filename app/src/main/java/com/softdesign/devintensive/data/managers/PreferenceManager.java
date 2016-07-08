@@ -3,9 +3,11 @@ package com.softdesign.devintensive.data.managers;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
+import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.VKAuth;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.DevIntensiveApplication;
+import com.softdesign.devintensive.utils.Jackson2Parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +78,17 @@ public class PreferenceManager {
 
     public String loadGitAuth() {
         return mSharedPreferences.getString(ConstantManager.GIT_AUTH_TOKEN, null);
+    }
+
+    public void saveUserProfileJson(String userProfileJson){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_PROFILE_JSON, userProfileJson);
+        editor.apply();
+    }
+
+    public String loadUserInfo(){
+        return mSharedPreferences.getString(ConstantManager.USER_PROFILE_JSON, null);
+
     }
 
 }

@@ -116,8 +116,8 @@ public class GitAuthActivity extends BaseActivity {
                 HttpURLConnection httpURLConnection =
                         (HttpURLConnection) new URL(OAUTH_ACCESS_TOKEN_URL).openConnection();
                 httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setReadTimeout(30000);
-                httpURLConnection.setConnectTimeout(30000);
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setDoInput(true);
                 OutputStream outputStream = httpURLConnection.getOutputStream();

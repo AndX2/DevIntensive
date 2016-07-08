@@ -2,26 +2,49 @@ package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.JsonReader;
+import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.pojo.UserInfo;
+import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class AuthActivity extends AppCompatActivity {
+
+    public static final String TAG = "AuthActivityTag";
+
+    private String jsonUserInfo;
 
     @BindView(R.id.et_email_auth) EditText mUserEmailAuth;
     @BindView(R.id.et_pass_auth) EditText mUserPassAuth;
@@ -34,6 +57,19 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
+        jsonUserInfo = DataManager.getInstance().getPreferenceManager().loadUserInfo();
+        try {
+            JSONObject jsonObject = new JSONObject(jsonUserInfo);
+            JSONObject data = jsonObject.getJSONObject("data");
+            JSONObject user = data.getJSONObject("user");
+            JSONObject contacts = user.getJSONObject("contacts");
+            String eMail = contacts.getString("email");
+            mUserEmailAuth.setText(eMail);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         mUserEmailAuth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
@@ -57,9 +93,10 @@ public class AuthActivity extends AppCompatActivity {
 //        if (DataManager.getInstance().getPreferenceManager().loadVKAuth() != null){
 //            startActivity(new Intent(this, MainActivity.class));
 //        }
+
     }
 
-    @OnClick({R.id.iv_vk_auth, R.id.iv_git_auth})
+    @OnClick({R.id.iv_vk_auth, R.id.iv_git_auth, R.id.btn_auth})
     public void onClick(View view){
         Intent intent;
         switch (view.getId()){
@@ -71,6 +108,12 @@ public class AuthActivity extends AppCompatActivity {
                 intent = new Intent(this, GitAuthActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.btn_auth:
+                String[] authInfo = {mUserEmailAuth.getText().toString(),
+                        mUserPassAuth.getText().toString()};
+                AsyncPostAuth asyncPostAuth = new AsyncPostAuth();
+                asyncPostAuth.execute(authInfo);
+                break;
         }
 
     }
@@ -80,8 +123,91 @@ public class AuthActivity extends AppCompatActivity {
         Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
     }
 
-    @OnClick({R.id.btn_auth})
-    public void actionIntent(View view){
+    private class AsyncPostAuth extends AsyncTask<String, Void, String> {
+
+        private String getPostDataString(HashMap<String, String> params){
+            StringBuilder result = new StringBuilder();
+            boolean first = true;
+            try {
+                for(Map.Entry<String, String> entry : params.entrySet()){
+                    if (first)
+                        first = false;
+                    else
+                        result.append("&");
+                    result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+                    result.append("=");
+                    result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Error getPostDataString");
             }
+            Log.d(TAG, "getPostDataString = " + result.toString());
+            return result.toString();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String eMail = strings[0];
+            String pass = strings[1];
+            HashMap<String, String> postDataParams = new HashMap<>();
+            postDataParams.put("email", eMail);
+            postDataParams.put("password", pass);
+            try {
+                HttpURLConnection httpURLConnection =
+                        (HttpURLConnection) new URL(ConstantManager.API_LOGIN_URL).openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(outputStream, "UTF-8"));
+                writer.write(getPostDataString(postDataParams));
+                writer.flush();
+                writer.close();
+                outputStream.close();
+                Log.d(TAG, "responseCode = " + httpURLConnection.getResponseCode());
+                if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+                            httpURLConnection.getInputStream()));
+                    String inputLine;
+                    StringBuffer response = new StringBuffer();
+
+                    while ((inputLine = bufferedReader.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    bufferedReader.close();
+
+                    Log.d(TAG, "response = " + response.toString());
+                    return response.toString();
+
+                } else {
+                    Log.d(TAG, "POST request not worked");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+
+            if ((response == null) || (response.length() < 10)) return;
+            Log.d(TAG, "onPostExecute!");
+            DataManager.getInstance().getPreferenceManager().saveUserProfileJson(response);
+            startActivity(new Intent(AuthActivity.this, MainActivity.class));
+            //startMainActivity();
+
+        }
+    }
+
+//    private void startMainActivity(){
+//        startActivity(new Intent(this, MainActivity.class));
+//
+//    }
 
 }

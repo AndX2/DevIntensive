@@ -41,6 +41,7 @@ import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 import com.squareup.picasso.Picasso;
@@ -69,6 +70,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     DataManager mDataManager;
     int mCurrentEditMode = 0;
+    private UserInfo mUserProfile;
 
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout mCoordinatorLayout;

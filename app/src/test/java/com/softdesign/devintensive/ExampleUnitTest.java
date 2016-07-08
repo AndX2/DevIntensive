@@ -1,7 +1,10 @@
 package com.softdesign.devintensive;
 
+import com.softdesign.devintensive.pojo.UserInfo;
+import com.softdesign.devintensive.utils.Jackson2Parser;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,9 +17,12 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
 
 
+
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
     }
+
+
 
 }

@@ -15,6 +15,7 @@ public interface ConstantManager {
     String VK_ID = "User_key_6";
     String VK_TOKEN = "User_key_7";
     String GIT_AUTH_TOKEN = "User_key_8";
+    String USER_PROFILE_JSON = "User_key_9";
 
     //MainActivity
     String TAG_PREFIX = "Main activity";
@@ -31,5 +32,7 @@ public interface ConstantManager {
     //VKAuthActivity
     String VK_APP_ID = "5535159";
     String GIT_APP_ID = "47ea27470ddeb8dd366f";
+    String API_LOGIN_URL = "http://devintensive.softdesign-apps.ru/api/login";
+
 
 }

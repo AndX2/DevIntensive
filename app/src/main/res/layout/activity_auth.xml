@@ -89,7 +89,7 @@
                     android:fontFamily="sans-serif-condensed"
                     android:hint="@string/hint_pass"
                     android:inputType="textPassword"
-                    android:text="@string/forgot_pass_capture"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textColorHint="@color/grey"
                     android:textSize="@dimen/text_body1_size_14"/>
