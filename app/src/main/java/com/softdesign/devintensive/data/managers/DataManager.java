@@ -8,6 +8,8 @@ public class DataManager {
 
     private static DataManager instance = null;
     private PreferenceManager mPreferenceManager;
+    private UserInfoManager mUserInfoManager;
+
 
     private DataManager() {
         this.mPreferenceManager = new PreferenceManager();
@@ -23,5 +25,11 @@ public class DataManager {
     public PreferenceManager getPreferenceManager() {
         return mPreferenceManager;
     }
+
+    public UserInfoManager getUserInfoManager(){
+        if (mUserInfoManager == null) mUserInfoManager = UserInfoManager.getInstance();
+        return mUserInfoManager;
+    }
+
 
 }

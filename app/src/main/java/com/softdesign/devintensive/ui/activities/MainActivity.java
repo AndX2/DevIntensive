@@ -41,7 +41,9 @@ import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.UserInfoManager;
 import com.softdesign.devintensive.pojo.UserInfo;
+import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 import com.squareup.picasso.Picasso;
@@ -118,38 +120,25 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mDataManager = DataManager.getInstance();
 
         mFab.setOnClickListener(this);
-        mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("+7(###) ###-##-##"));
-        mUserInfo.get(1).setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                boolean isValid = TextValueValidator.validate(Type.Email, mUserInfo.get(1).getText().toString());
-                if (!b) {
-                    if (!isValid) {
-                        mUserInfo.get(1).setTextColor(Color.RED);
-                        showSnackbar(getString(R.string.error_email_value_message));
-                    }
-                } else {
-                    mUserInfo.get(1).setTextColor(Color.BLACK);
-                    if (!isValid) mUserInfo.get(1).setText("");
-                }
-            }
-        });
-        mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("vk.com/*******************"));
-        mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("github.com/*******************"));
 
         if (savedInstanceState == null) {
             showSnackbar("Activity start is first");
+            fillUserInfo();
         } else {
             showSnackbar("Activity is restart");
             mCurrentEditMode = savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY, 0);
             changeEditMode(mCurrentEditMode);
         }
 
-        loadUserInfoValues();
+//        loadUserInfoValues();
 
-        Picasso.with(this)
-                .load(mDataManager.getPreferenceManager().loadUserPhoto())
-                .into(mUserProfilePhoto);
+
+
+//        Picasso.with(this)
+//                .load(mDataManager.getPreferenceManager().loadUserPhoto())
+//                .into(mUserProfilePhoto);
+
+        onOffMaskInput(true);
 
     }
 
@@ -296,6 +285,37 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    private boolean fillUserInfo() {
+        UserInfoManager manager = DataManager.getInstance().getUserInfoManager();
+        if (!manager.isEmpty()){
+            mUserInfo.get(0).setText(manager.getPhone());
+            mUserInfo.get(1).setText(manager.geteMail());
+            mUserInfo.get(2).setText(manager.getVk());
+            mUserInfo.get(3).setText(manager.getRepo().get(0).getGit());
+            mUserInfo.get(4).setText(manager.getBio());
+            Picasso.with(this)
+                    .load(manager.getPhoto())
+                    .into(mUserProfilePhoto);
+
+            return true;
+        }
+        return false;
+    }
+
+    private void onOffMaskInput(boolean on){
+        if (on) {
+            mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("+7(###) ###-##-##"));
+            mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("vk.com/*******************"));
+            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("github.com/*******************"));
+        }else {
+            mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("*"));
+            mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("*"));
+            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("*"));
+        }
+
+    }
+
+
     private void showSnackbar(String message) {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
@@ -360,6 +380,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         for (int i = 0; i < userData.size(); i++) {
             mUserInfo.get(i).setText(userData.get(i));
         }
+
     }
 
     private void saveUserInfoValues() {
@@ -448,7 +469,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private void actionView(String urlString) {
-        Uri address = Uri.parse("https://" + urlString);
+        if (!urlString.contains("http")) urlString = "https://" + urlString;
+        Uri address = Uri.parse(urlString);
         Intent openlink = new Intent(Intent.ACTION_VIEW, address);
         startActivity(openlink);
     }

@@ -2,6 +2,7 @@ package com.softdesign.devintensive.data.managers;
 
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 
 import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.VKAuth;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 
 public class PreferenceManager {
+
+    public static final String TAG = "PreferenceManagerTag";
 
     private SharedPreferences mSharedPreferences;
     private static final String[] USER_FIELDS = {ConstantManager.USER_PHONE_KEY,
@@ -88,6 +91,20 @@ public class PreferenceManager {
 
     public String loadUserInfo(){
         return mSharedPreferences.getString(ConstantManager.USER_PROFILE_JSON, null);
+
+    }
+
+    public void savePassFingerPrint (String passFingerPrint){
+        Log.d(TAG, "passFingerPrint= " + passFingerPrint);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.PASS_FINGERPRINT, passFingerPrint);
+        editor.apply();
+    }
+
+    public boolean checkPassFingerPrint (String passFingerPrint) {
+        Log.d(TAG, passFingerPrint + " <> " +mSharedPreferences.getString(ConstantManager.PASS_FINGERPRINT, null) +
+                " = " + passFingerPrint.equals(mSharedPreferences.getString(ConstantManager.PASS_FINGERPRINT, null)));
+        return passFingerPrint.equals(mSharedPreferences.getString(ConstantManager.PASS_FINGERPRINT, null));
 
     }
 

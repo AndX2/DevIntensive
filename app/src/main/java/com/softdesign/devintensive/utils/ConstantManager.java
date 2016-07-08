@@ -16,6 +16,7 @@ public interface ConstantManager {
     String VK_TOKEN = "User_key_7";
     String GIT_AUTH_TOKEN = "User_key_8";
     String USER_PROFILE_JSON = "User_key_9";
+    String PASS_FINGERPRINT = "pass fingerPrint";
 
     //MainActivity
     String TAG_PREFIX = "Main activity";
@@ -34,5 +35,8 @@ public interface ConstantManager {
     String GIT_APP_ID = "47ea27470ddeb8dd366f";
     String API_LOGIN_URL = "http://devintensive.softdesign-apps.ru/api/login";
 
+
+    //AuthActivity
+    long AUTH_ERROR_FLASH_DELAY = 500;
 
 }

@@ -2,10 +2,14 @@ package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 import android.util.Log;
@@ -17,6 +21,7 @@ import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.SecurityHelper;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 
 import org.json.JSONException;
@@ -50,6 +55,8 @@ public class AuthActivity extends AppCompatActivity {
     @BindView(R.id.et_pass_auth) EditText mUserPassAuth;
     @BindView(R.id.activity_auth_root) LinearLayout rootView;
     @BindView(R.id.btn_auth) Button mBtnEnter;
+    @BindView(R.id.card_auth)
+    CardView mCardView;
 
 
     @Override
@@ -57,18 +64,8 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
-        jsonUserInfo = DataManager.getInstance().getPreferenceManager().loadUserInfo();
-        try {
-            JSONObject jsonObject = new JSONObject(jsonUserInfo);
-            JSONObject data = jsonObject.getJSONObject("data");
-            JSONObject user = data.getJSONObject("user");
-            JSONObject contacts = user.getJSONObject("contacts");
-            String eMail = contacts.getString("email");
-            mUserEmailAuth.setText(eMail);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        if (!DataManager.getInstance().getUserInfoManager().isEmpty())
+            mUserEmailAuth.setText(DataManager.getInstance().getUserInfoManager().geteMail());
 
         mUserEmailAuth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -122,6 +119,18 @@ public class AuthActivity extends AppCompatActivity {
     private void showSnackbar(String message) {
         Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
     }
+
+    private void flashError(){
+        mCardView.setBackgroundColor(Color.RED);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCardView.setBackgroundColor(Color.WHITE);;
+            }
+        }, ConstantManager.AUTH_ERROR_FLASH_DELAY);
+    }
+
 
     private class AsyncPostAuth extends AsyncTask<String, Void, String> {
 
@@ -196,9 +205,19 @@ public class AuthActivity extends AppCompatActivity {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
 
-            if ((response == null) || (response.length() < 10)) return;
+            if ((response == null) || (response.length() < 10)){
+                if (DataManager.getInstance().getPreferenceManager()
+                        .checkPassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()))){
+                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
+                    return;
+                }
+                flashError();
+                return;
+            }
             Log.d(TAG, "onPostExecute!");
-            DataManager.getInstance().getPreferenceManager().saveUserProfileJson(response);
+            DataManager.getInstance().getPreferenceManager()
+                    .savePassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()));
+            DataManager.getInstance().getUserInfoManager().setJsonUserInfo(response);
             startActivity(new Intent(AuthActivity.this, MainActivity.class));
             //startMainActivity();
 
