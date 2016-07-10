@@ -3,6 +3,7 @@ package com.softdesign.devintensive.ui.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetBehavior;
@@ -17,10 +18,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.net.request.UserLoginRequest;
 import com.softdesign.devintensive.pojo.UserInfo;
+import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.GsonHelper;
 import com.softdesign.devintensive.utils.SecurityHelper;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 
@@ -44,17 +49,23 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.http.HTTP;
 
 public class AuthActivity extends AppCompatActivity {
 
     public static final String TAG = "AuthActivityTag";
 
-    private String jsonUserInfo;
-
-    @BindView(R.id.et_email_auth) EditText mUserEmailAuth;
-    @BindView(R.id.et_pass_auth) EditText mUserPassAuth;
-    @BindView(R.id.activity_auth_root) LinearLayout rootView;
-    @BindView(R.id.btn_auth) Button mBtnEnter;
+    @BindView(R.id.et_email_auth)
+    EditText mUserEmailAuth;
+    @BindView(R.id.et_pass_auth)
+    EditText mUserPassAuth;
+    @BindView(R.id.activity_auth_root)
+    LinearLayout rootView;
+    @BindView(R.id.btn_auth)
+    Button mBtnEnter;
     @BindView(R.id.card_auth)
     CardView mCardView;
 
@@ -64,8 +75,9 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
-        if (!DataManager.getInstance().getUserInfoManager().isEmpty())
-            mUserEmailAuth.setText(DataManager.getInstance().getUserInfoManager().geteMail());
+        UserProfile userProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
+        if (userProfile != null)
+            mUserEmailAuth.setText(userProfile.getData().getUser().getContacts().getEmail());
 
         mUserEmailAuth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -76,9 +88,9 @@ public class AuthActivity extends AppCompatActivity {
                         mUserEmailAuth.setTextColor(Color.RED);
                         showSnackbar(getString(R.string.error_email_value_message));
                     }
-                }else {
+                } else {
                     mUserEmailAuth.setTextColor(Color.BLACK);
-                    if(!isValid) mUserEmailAuth.setText("");
+                    if (!isValid) mUserEmailAuth.setText("");
                 }
             }
         });
@@ -93,10 +105,10 @@ public class AuthActivity extends AppCompatActivity {
 
     }
 
-    @OnClick({R.id.iv_vk_auth, R.id.iv_git_auth, R.id.btn_auth})
-    public void onClick(View view){
+    @OnClick({R.id.iv_vk_auth, R.id.iv_git_auth, R.id.btn_auth, R.id.tv_forgot_pass})
+    public void onClick(View view) {
         Intent intent;
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.iv_vk_auth:
                 intent = new Intent(this, VKAuthActivity.class);
                 startActivity(intent);
@@ -106,10 +118,14 @@ public class AuthActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.btn_auth:
-                String[] authInfo = {mUserEmailAuth.getText().toString(),
-                        mUserPassAuth.getText().toString()};
-                AsyncPostAuth asyncPostAuth = new AsyncPostAuth();
-                asyncPostAuth.execute(authInfo);
+                logIn();
+//                String[] authInfo = {mUserEmailAuth.getText().toString(),
+//                        mUserPassAuth.getText().toString()};
+//                AsyncPostAuth asyncPostAuth = new AsyncPostAuth();
+//                asyncPostAuth.execute(authInfo);
+                break;
+            case R.id.tv_forgot_pass:
+                rememberPass();
                 break;
         }
 
@@ -120,25 +136,66 @@ public class AuthActivity extends AppCompatActivity {
         Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
     }
 
-    private void flashError(){
+    private void rememberPass() {
+        Intent rememberIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://devintensive.softdesign-apps.ru/forgotpass"));
+        startActivity(rememberIntent);
+    }
+
+    private void flashError() {
         mCardView.setBackgroundColor(Color.RED);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mCardView.setBackgroundColor(Color.WHITE);;
+                mCardView.setBackgroundColor(Color.WHITE);
+
             }
         }, ConstantManager.AUTH_ERROR_FLASH_DELAY);
+    }
+
+    private void loginSuccess(Response<UserProfile> response){
+        showSnackbar(getString(R.string.enter_success));
+        DataManager.getInstance().getPreferenceManager().saveUserProfile(response.body());
+        startMainActivity();
+//        showSnackbar(response.body().getData().getToken());
+//        String json = GsonHelper.getJsonFromObject(response.body(), UserProfile.class);
+//        Log.d(TAG, json);
+    }
+
+    private void logIn(){
+        Call<UserProfile> call = DataManager.getInstance().getNetworkManager()
+                .loginUser(new UserLoginRequest(mUserEmailAuth.getText().toString(),
+                        mUserPassAuth.getText().toString()));
+        call.enqueue(new Callback<UserProfile>() {
+            @Override
+            public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
+                if (response.code() == 200){
+                    loginSuccess(response);
+                }else if(response.code() == 404){
+                    showSnackbar(getString(R.string.login_pass_is_wrong));
+                }else{
+                    showSnackbar(getString(R.string.error_other_login));
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfile> call, Throwable t) {
+                //TODO: handle here error logIn
+
+            }
+        });
     }
 
 
     private class AsyncPostAuth extends AsyncTask<String, Void, String> {
 
-        private String getPostDataString(HashMap<String, String> params){
+        private String getPostDataString(HashMap<String, String> params) {
             StringBuilder result = new StringBuilder();
             boolean first = true;
             try {
-                for(Map.Entry<String, String> entry : params.entrySet()){
+                for (Map.Entry<String, String> entry : params.entrySet()) {
                     if (first)
                         first = false;
                     else
@@ -178,7 +235,7 @@ public class AuthActivity extends AppCompatActivity {
                 writer.close();
                 outputStream.close();
                 Log.d(TAG, "responseCode = " + httpURLConnection.getResponseCode());
-                if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+                if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
                             httpURLConnection.getInputStream()));
                     String inputLine;
@@ -205,10 +262,10 @@ public class AuthActivity extends AppCompatActivity {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
 
-            if ((response == null) || (response.length() < 10)){
+            if ((response == null) || (response.length() < 10)) {
                 if (DataManager.getInstance().getPreferenceManager()
-                        .checkPassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()))){
-                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
+                        .checkPassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()))) {
+                    startMainActivity();
                     return;
                 }
                 flashError();
@@ -218,15 +275,14 @@ public class AuthActivity extends AppCompatActivity {
             DataManager.getInstance().getPreferenceManager()
                     .savePassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()));
             DataManager.getInstance().getUserInfoManager().setJsonUserInfo(response);
-            startActivity(new Intent(AuthActivity.this, MainActivity.class));
-            //startMainActivity();
+            startMainActivity();
 
         }
     }
 
-//    private void startMainActivity(){
-//        startActivity(new Intent(this, MainActivity.class));
-//
-//    }
+    private void startMainActivity() {
+        startActivity(new Intent(AuthActivity.this, MainActivity.class));
+
+    }
 
 }

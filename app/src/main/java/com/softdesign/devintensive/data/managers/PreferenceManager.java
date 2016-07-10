@@ -4,11 +4,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
-import com.softdesign.devintensive.pojo.UserInfo;
+import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.pojo.VKAuth;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.DevIntensiveApplication;
-import com.softdesign.devintensive.utils.Jackson2Parser;
+import com.softdesign.devintensive.utils.GsonHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +105,20 @@ public class PreferenceManager {
         Log.d(TAG, passFingerPrint + " <> " +mSharedPreferences.getString(ConstantManager.PASS_FINGERPRINT, null) +
                 " = " + passFingerPrint.equals(mSharedPreferences.getString(ConstantManager.PASS_FINGERPRINT, null)));
         return passFingerPrint.equals(mSharedPreferences.getString(ConstantManager.PASS_FINGERPRINT, null));
+
+    }
+
+    public void saveUserProfile(UserProfile userProfile){
+        String json = GsonHelper.getJsonFromObject(userProfile, UserProfile.class);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_PROFILE, json);
+        editor.apply();
+    }
+
+    public UserProfile loadUserProfile(){
+        String json = mSharedPreferences.getString(ConstantManager.USER_PROFILE, null);
+        if (json == null) return null;
+        return (UserProfile) GsonHelper.getObjectFromJson(json, UserProfile.class);
 
     }
 

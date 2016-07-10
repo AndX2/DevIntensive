@@ -38,11 +38,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.UserInfoManager;
 import com.softdesign.devintensive.pojo.UserInfo;
+import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
@@ -72,7 +74,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     DataManager mDataManager;
     int mCurrentEditMode = 0;
-    private UserInfo mUserProfile;
+    UserProfile mUserProfile;
 
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout mCoordinatorLayout;
@@ -98,6 +100,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     FloatingActionButton mFab;
     @BindViews({R.id.et_phone, R.id.et_email, R.id.et_vk, R.id.et_git1, R.id.et_myself})
     List<EditText> mUserInfo;
+    @BindView(R.id.tv_ratio)
+    TextView mTVRaiting;
+    @BindView(R.id.tv_projects)
+    TextView mTVProjects;
+    @BindView(R.id.tv_code_rows)
+    TextView mTVRowsCode;
 
 
     File mPhotoFile = null;
@@ -108,6 +116,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.container_main);
         ButterKnife.bind(this);
+
+        mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
+        if (mUserProfile != null){
+            mTVRaiting.setText(mUserProfile.getData().getUser().getProfileValues().getRait() + "");
+            mTVProjects.setText(mUserProfile.getData().getUser().getProfileValues().getProjects() + "");
+            mTVRowsCode.setText(mUserProfile.getData().getUser().getProfileValues().getLinesCode() + "");
+
+        }
 
         mProfilePhotoPlaceholder.setOnClickListener(this);
         mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheetLayout));
@@ -131,7 +147,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
 //        loadUserInfoValues();
-
 
 
 //        Picasso.with(this)
@@ -287,7 +302,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private boolean fillUserInfo() {
         UserInfoManager manager = DataManager.getInstance().getUserInfoManager();
-        if (!manager.isEmpty()){
+        if (!manager.isEmpty()) {
             mUserInfo.get(0).setText(manager.getPhone());
             mUserInfo.get(1).setText(manager.geteMail());
             mUserInfo.get(2).setText(manager.getVk());
@@ -302,12 +317,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         return false;
     }
 
-    private void onOffMaskInput(boolean on){
+    private void onOffMaskInput(boolean on) {
         if (on) {
             mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("+7(###) ###-##-##"));
             mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("vk.com/*******************"));
             mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("github.com/*******************"));
-        }else {
+        } else {
             mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("*"));
             mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("*"));
             mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("*"));

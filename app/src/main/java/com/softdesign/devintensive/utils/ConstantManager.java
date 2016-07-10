@@ -17,6 +17,7 @@ public interface ConstantManager {
     String GIT_AUTH_TOKEN = "User_key_8";
     String USER_PROFILE_JSON = "User_key_9";
     String PASS_FINGERPRINT = "pass fingerPrint";
+    String USER_PROFILE = "User_key_10";
 
     //MainActivity
     String TAG_PREFIX = "Main activity";
@@ -38,5 +39,6 @@ public interface ConstantManager {
 
     //AuthActivity
     long AUTH_ERROR_FLASH_DELAY = 500;
+
 
 }

@@ -26,4 +26,7 @@
     <string name="error_no_email_client">NO email client installed</string>
     <string name="camera">CAMERA</string>
     <string name="gallery">GALLERY</string>
+    <string name="enter_success">Вход выполнен!</string>
+    <string name="login_pass_is_wrong">Неверный логин или пароль!</string>
+    <string name="error_other_login">Неизвестная ошибка!</string>
 </resources>
