@@ -57,6 +57,10 @@
     <dimen name="text_headline_size_24">24sp</dimen>
     <dimen name="profile_image_size">256dp</dimen>
     <dimen name="fab_right_space">8dp</dimen>
+    <dimen name="ratio_placeholder_height">112dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!--Ratio keylines-->
     <!--https://material.google.com/layout/metrics-keylines.html#metrics-keylines-keylines-spacing

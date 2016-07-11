@@ -5,6 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.MediumTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.softdesign.devintensive.utils.validator.TextValueValidator;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
