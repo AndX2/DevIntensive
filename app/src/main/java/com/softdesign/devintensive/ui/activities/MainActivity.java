@@ -42,7 +42,6 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.data.managers.UserInfoManager;
 import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
@@ -130,12 +129,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         ButterKnife.bind(this);
 
         mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
-        if (mUserProfile != null){
-            mTVRaiting.setText(mUserProfile.getData().getUser().getProfileValues().getRait() + "");
-            mTVProjects.setText(mUserProfile.getData().getUser().getProfileValues().getProjects() + "");
-            mTVRowsCode.setText(mUserProfile.getData().getUser().getProfileValues().getLinesCode() + "");
-
-        }
 
         mProfilePhotoPlaceholder.setOnClickListener(this);
         mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheetLayout));
@@ -217,7 +210,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         if ((resultCode != RESULT_OK)) return;
         switch (requestCode) {
             case REQUEST_CODE_CAMERA_PICTURE:
-                showSnackbar("handle Camera");
+                //showSnackbar("handle Camera");
                 if (mPhotoFile != null) {
                     mSelectedImageUri = Uri.fromFile(mPhotoFile);
                     insertImage(mSelectedImageUri);
@@ -315,19 +308,21 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private boolean fillUserInfo() {
-        UserInfoManager manager = DataManager.getInstance().getUserInfoManager();
-        if (!manager.isEmpty()) {
-            mUserInfo.get(0).setText(manager.getPhone());
-            mUserInfo.get(1).setText(manager.geteMail());
-            mUserInfo.get(2).setText(manager.getVk());
-            mUserInfo.get(3).setText(manager.getRepo().get(0).getGit());
-            mUserInfo.get(4).setText(manager.getBio());
-            Picasso.with(this)
-                    .load(manager.getPhoto())
-                    .into(mUserProfilePhoto);
 
+        if (mUserProfile != null){
+            UserProfile.User user = mUserProfile.getData().getUser();
+            mTVRaiting.setText(user.getProfileValues().getRait() + "");
+            mTVProjects.setText(user.getProfileValues().getProjects() + "");
+            mTVRowsCode.setText(user.getProfileValues().getLinesCode() + "");
+            mUserInfo.get(0).setText(user.getContacts().getPhone());
+            mUserInfo.get(1).setText(user.getContacts().getEmail());
+            mUserInfo.get(2).setText(user.getContacts().getVk());
+            mUserInfo.get(3).setText(user.getRepositories().getRepo().get(0).getGit());
+            mUserInfo.get(4).setText(user.getPublicInfo().getBio());
             return true;
+
         }
+
         return false;
     }
 
@@ -337,9 +332,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("vk.com/*******************"));
             mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("github.com/*******************"));
         } else {
-            mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("*"));
-            mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("*"));
-            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("*"));
+            mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("***************************************"));
+            mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("***************************************"));
+            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("***************************************"));
         }
 
     }
@@ -383,7 +378,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private void changeEditMode(int mode) {
         if (mode == 1) {
-            loadUserInfoValues();
+            //loadUserInfoValues();
 
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
             ButterKnife.apply(mUserInfo, Enabled, true);
@@ -396,7 +391,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 userPhotoIsChanged = false;
                 uploadUserPhoto();
             }
-            saveUserInfoValues();
+            //saveUserInfoValues();
             mFab.setImageResource(R.drawable.ic_edit_black_24dp);
             ButterKnife.apply(mUserInfo, Enabled, false);
             mProfilePhotoPlaceholder.setVisibility(GONE);
