@@ -46,6 +46,7 @@ import com.softdesign.devintensive.data.managers.UserInfoManager;
 import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
+import com.softdesign.devintensive.utils.AndroidDataHelper;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 import com.squareup.picasso.Picasso;
@@ -53,6 +54,7 @@ import com.vicmikhailau.maskededittext.MaskedWatcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,6 +66,13 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.support.design.widget.NavigationView.*;
 import static com.softdesign.devintensive.utils.ConstantManager.*;
@@ -110,6 +119,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     File mPhotoFile = null;
     private Uri mSelectedImageUri;
+
+    private boolean userPhotoIsChanged = false;
+    private boolean userAvatarIsChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,11 +221,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 if (mPhotoFile != null) {
                     mSelectedImageUri = Uri.fromFile(mPhotoFile);
                     insertImage(mSelectedImageUri);
+                    userPhotoIsChanged = true;
                 }
                 break;
             case REQUEST_CODE_GALLERY_PICTURE:
                 Log.d(ConstantManager.TAG_PREFIX, data.getData().toString());
                 insertImage(Uri.parse(data.getData().toString()));
+                userPhotoIsChanged = true;
                 break;
         }
     }
@@ -378,6 +392,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mAppbarParams.setScrollFlags(0);
             mToolbarLayout.setLayoutParams(mAppbarParams);
         } else {
+            if (userPhotoIsChanged){
+                userPhotoIsChanged = false;
+                uploadUserPhoto();
+            }
             saveUserInfoValues();
             mFab.setImageResource(R.drawable.ic_edit_black_24dp);
             ButterKnife.apply(mUserInfo, Enabled, false);
@@ -387,6 +405,47 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mToolbarLayout.setLayoutParams(mAppbarParams);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+
+    }
+
+    private void uploadUserPhoto() {
+        File file = null;
+        Uri uriPhoto = DataManager.getInstance().getPreferenceManager().loadUserPhoto();
+
+        switch (uriPhoto.getScheme()){
+            case "file":
+                file = new File(uriPhoto.getPath());
+                break;
+            case "content":
+                file = new File(AndroidDataHelper.getRealPathFromURI(this, uriPhoto));
+                break;
+            default:
+                Log.d(TAG_PREFIX, "Ошибка при извлечении файла при отправке фото" + uriPhoto.getPath());
+                break;
+        }
+
+        if (file != null) {
+            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("photo", file.getName(), requestFile);
+
+            Call<ResponseBody> call = mDataManager.getNetworkManager()
+                    .uploadUserPhoto(mUserProfile.getData().getUser().getId(), body);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d(TAG_PREFIX, "photo upload success" + response);
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.d(TAG_PREFIX, "photo upload error" + t);
+                }
+            });
+        }
+
+
+
+
 
     }
 

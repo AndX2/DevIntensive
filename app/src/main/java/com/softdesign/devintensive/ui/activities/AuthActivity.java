@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -68,6 +69,8 @@ public class AuthActivity extends AppCompatActivity {
     Button mBtnEnter;
     @BindView(R.id.card_auth)
     CardView mCardView;
+    Context context;
+    Context appContext;
 
 
     @Override
