@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -68,6 +69,8 @@ public class AuthActivity extends AppCompatActivity {
     Button mBtnEnter;
     @BindView(R.id.card_auth)
     CardView mCardView;
+    Context context;
+    Context appContext;
 
 
     @Override
@@ -103,6 +106,12 @@ public class AuthActivity extends AppCompatActivity {
 //            startActivity(new Intent(this, MainActivity.class));
 //        }
 
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        mUserPassAuth.setText("");
     }
 
     @OnClick({R.id.iv_vk_auth, R.id.iv_git_auth, R.id.btn_auth, R.id.tv_forgot_pass})
@@ -186,98 +195,6 @@ public class AuthActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-
-    private class AsyncPostAuth extends AsyncTask<String, Void, String> {
-
-        private String getPostDataString(HashMap<String, String> params) {
-            StringBuilder result = new StringBuilder();
-            boolean first = true;
-            try {
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    if (first)
-                        first = false;
-                    else
-                        result.append("&");
-                    result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-                    result.append("=");
-                    result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-                }
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                Log.d(TAG, "Error getPostDataString");
-            }
-            Log.d(TAG, "getPostDataString = " + result.toString());
-            return result.toString();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String eMail = strings[0];
-            String pass = strings[1];
-            HashMap<String, String> postDataParams = new HashMap<>();
-            postDataParams.put("email", eMail);
-            postDataParams.put("password", pass);
-            try {
-                HttpURLConnection httpURLConnection =
-                        (HttpURLConnection) new URL(ConstantManager.API_LOGIN_URL).openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(outputStream, "UTF-8"));
-                writer.write(getPostDataString(postDataParams));
-                writer.flush();
-                writer.close();
-                outputStream.close();
-                Log.d(TAG, "responseCode = " + httpURLConnection.getResponseCode());
-                if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-                            httpURLConnection.getInputStream()));
-                    String inputLine;
-                    StringBuffer response = new StringBuffer();
-
-                    while ((inputLine = bufferedReader.readLine()) != null) {
-                        response.append(inputLine);
-                    }
-                    bufferedReader.close();
-
-                    Log.d(TAG, "response = " + response.toString());
-                    return response.toString();
-
-                } else {
-                    Log.d(TAG, "POST request not worked");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String response) {
-            super.onPostExecute(response);
-
-            if ((response == null) || (response.length() < 10)) {
-                if (DataManager.getInstance().getPreferenceManager()
-                        .checkPassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()))) {
-                    startMainActivity();
-                    return;
-                }
-                flashError();
-                return;
-            }
-            Log.d(TAG, "onPostExecute!");
-            DataManager.getInstance().getPreferenceManager()
-                    .savePassFingerPrint(SecurityHelper.getMd5(mUserPassAuth.getText().toString()));
-            DataManager.getInstance().getUserInfoManager().setJsonUserInfo(response);
-            startMainActivity();
-
-        }
     }
 
     private void startMainActivity() {

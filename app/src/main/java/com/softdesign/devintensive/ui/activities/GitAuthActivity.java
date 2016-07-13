@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.managers.DataManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -73,6 +75,11 @@ public class GitAuthActivity extends BaseActivity {
 
         });
         mWebView.loadUrl(url);
+    }
+
+    private void startMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+
     }
 
     @Override
@@ -157,7 +164,9 @@ public class GitAuthActivity extends BaseActivity {
             if ((response == null) || (response.length() < 10)) return;
             String[] partsResponse = response.split("&");
             String accessToken = partsResponse[0].substring(partsResponse[0].indexOf("=") + 1);
+            DataManager.getInstance().getPreferenceManager().saveGitAuth(accessToken);
             Log.d(TAG, "accessToken = " + accessToken);
+            startMainActivity();
             onBackPressed();
 
         }

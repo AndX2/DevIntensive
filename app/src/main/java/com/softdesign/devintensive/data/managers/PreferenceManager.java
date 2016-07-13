@@ -56,7 +56,7 @@ public class PreferenceManager {
 
     public Uri loadUserPhoto() {
         return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY,
-                "android.resource://com.softdesign.devintensive/drawable/user_avatar"));
+                "android.resource://com.softdesign.devintensive/drawable/user_photo"));
     }
 
     public void saveVKAuth(VKAuth vkAuth) {

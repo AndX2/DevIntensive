@@ -11,7 +11,6 @@ public class DataManager {
 
     private static DataManager instance = null;
     private PreferenceManager mPreferenceManager;
-    private UserInfoManager mUserInfoManager;
     private NetworkManager mNetworkManager;
 
 
@@ -28,11 +27,6 @@ public class DataManager {
 
     public PreferenceManager getPreferenceManager() {
         return mPreferenceManager;
-    }
-
-    public UserInfoManager getUserInfoManager(){
-        if (mUserInfoManager == null) mUserInfoManager = UserInfoManager.getInstance();
-        return mUserInfoManager;
     }
 
     public NetworkManager getNetworkManager(){

@@ -4,7 +4,10 @@ import com.softdesign.devintensive.net.RestService;
 import com.softdesign.devintensive.net.ServiceGenerator;
 import com.softdesign.devintensive.net.request.UserLoginRequest;
 import com.softdesign.devintensive.pojo.UserProfile;
+import com.softdesign.devintensive.utils.GsonHelper;
 
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 /**
@@ -30,6 +33,10 @@ public class NetworkManager {
 
     public Call<UserProfile> loginUser(UserLoginRequest userLoginRequest){
         return mRestService.loginUser(userLoginRequest);
+    }
+
+    public Call<ResponseBody> uploadUserPhoto( String userId, MultipartBody.Part photo){
+        return mRestService.uploadUserPhoto(userId, photo);
     }
 
 }

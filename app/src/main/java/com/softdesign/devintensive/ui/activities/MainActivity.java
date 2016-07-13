@@ -42,10 +42,10 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.data.managers.UserInfoManager;
 import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
+import com.softdesign.devintensive.utils.AndroidDataHelper;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 import com.squareup.picasso.Picasso;
@@ -53,6 +53,7 @@ import com.vicmikhailau.maskededittext.MaskedWatcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,6 +65,13 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.support.design.widget.NavigationView.*;
 import static com.softdesign.devintensive.utils.ConstantManager.*;
@@ -111,6 +119,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     File mPhotoFile = null;
     private Uri mSelectedImageUri;
 
+    private boolean userPhotoIsChanged = false;
+    private boolean userAvatarIsChanged;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,12 +129,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         ButterKnife.bind(this);
 
         mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
-        if (mUserProfile != null){
-            mTVRaiting.setText(mUserProfile.getData().getUser().getProfileValues().getRait() + "");
-            mTVProjects.setText(mUserProfile.getData().getUser().getProfileValues().getProjects() + "");
-            mTVRowsCode.setText(mUserProfile.getData().getUser().getProfileValues().getLinesCode() + "");
-
-        }
 
         mProfilePhotoPlaceholder.setOnClickListener(this);
         mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheetLayout));
@@ -205,15 +210,17 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         if ((resultCode != RESULT_OK)) return;
         switch (requestCode) {
             case REQUEST_CODE_CAMERA_PICTURE:
-                showSnackbar("handle Camera");
+                //showSnackbar("handle Camera");
                 if (mPhotoFile != null) {
                     mSelectedImageUri = Uri.fromFile(mPhotoFile);
                     insertImage(mSelectedImageUri);
+                    userPhotoIsChanged = true;
                 }
                 break;
             case REQUEST_CODE_GALLERY_PICTURE:
                 Log.d(ConstantManager.TAG_PREFIX, data.getData().toString());
                 insertImage(Uri.parse(data.getData().toString()));
+                userPhotoIsChanged = true;
                 break;
         }
     }
@@ -301,19 +308,21 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private boolean fillUserInfo() {
-        UserInfoManager manager = DataManager.getInstance().getUserInfoManager();
-        if (!manager.isEmpty()) {
-            mUserInfo.get(0).setText(manager.getPhone());
-            mUserInfo.get(1).setText(manager.geteMail());
-            mUserInfo.get(2).setText(manager.getVk());
-            mUserInfo.get(3).setText(manager.getRepo().get(0).getGit());
-            mUserInfo.get(4).setText(manager.getBio());
-            Picasso.with(this)
-                    .load(manager.getPhoto())
-                    .into(mUserProfilePhoto);
 
+        if (mUserProfile != null){
+            UserProfile.User user = mUserProfile.getData().getUser();
+            mTVRaiting.setText(user.getProfileValues().getRait() + "");
+            mTVProjects.setText(user.getProfileValues().getProjects() + "");
+            mTVRowsCode.setText(user.getProfileValues().getLinesCode() + "");
+            mUserInfo.get(0).setText(user.getContacts().getPhone());
+            mUserInfo.get(1).setText(user.getContacts().getEmail());
+            mUserInfo.get(2).setText(user.getContacts().getVk());
+            mUserInfo.get(3).setText(user.getRepositories().getRepo().get(0).getGit());
+            mUserInfo.get(4).setText(user.getPublicInfo().getBio());
             return true;
+
         }
+
         return false;
     }
 
@@ -323,9 +332,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("vk.com/*******************"));
             mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("github.com/*******************"));
         } else {
-            mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("*"));
-            mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("*"));
-            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("*"));
+            mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("***************************************"));
+            mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("***************************************"));
+            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("***************************************"));
         }
 
     }
@@ -369,7 +378,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private void changeEditMode(int mode) {
         if (mode == 1) {
-            loadUserInfoValues();
+            //loadUserInfoValues();
 
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
             ButterKnife.apply(mUserInfo, Enabled, true);
@@ -378,7 +387,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mAppbarParams.setScrollFlags(0);
             mToolbarLayout.setLayoutParams(mAppbarParams);
         } else {
-            saveUserInfoValues();
+            if (userPhotoIsChanged){
+                userPhotoIsChanged = false;
+                uploadUserPhoto();
+            }
+            //saveUserInfoValues();
             mFab.setImageResource(R.drawable.ic_edit_black_24dp);
             ButterKnife.apply(mUserInfo, Enabled, false);
             mProfilePhotoPlaceholder.setVisibility(GONE);
@@ -387,6 +400,47 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mToolbarLayout.setLayoutParams(mAppbarParams);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+
+    }
+
+    private void uploadUserPhoto() {
+        File file = null;
+        Uri uriPhoto = DataManager.getInstance().getPreferenceManager().loadUserPhoto();
+
+        switch (uriPhoto.getScheme()){
+            case "file":
+                file = new File(uriPhoto.getPath());
+                break;
+            case "content":
+                file = new File(AndroidDataHelper.getRealPathFromURI(this, uriPhoto));
+                break;
+            default:
+                Log.d(TAG_PREFIX, "Ошибка при извлечении файла при отправке фото" + uriPhoto.getPath());
+                break;
+        }
+
+        if (file != null) {
+            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("photo", file.getName(), requestFile);
+
+            Call<ResponseBody> call = mDataManager.getNetworkManager()
+                    .uploadUserPhoto(mUserProfile.getData().getUser().getId(), body);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d(TAG_PREFIX, "photo upload success" + response);
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.d(TAG_PREFIX, "photo upload error" + t);
+                }
+            });
+        }
+
+
+
+
 
     }
 

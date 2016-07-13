@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
@@ -58,6 +59,11 @@ public class VKAuthActivity extends BaseActivity {
         mWebView.loadUrl(requestUrl);
     }
 
+    private void startMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+
+    }
+
     private void parseResponse(String response){
         if ((response == null) || (response.length() < 10)) return;
         String[] partsResponse = response.split("&");
@@ -65,6 +71,7 @@ public class VKAuthActivity extends BaseActivity {
         String idUserVK = partsResponse[2].substring(partsResponse[2].indexOf("=") + 1);
         Log.d(TAG, "id = " + idUserVK + "; token = " + accessToken);
         DataManager.getInstance().getPreferenceManager().saveVKAuth(new VKAuth(idUserVK, accessToken));
+        startMainActivity();
         super.onBackPressed();
 
     }
