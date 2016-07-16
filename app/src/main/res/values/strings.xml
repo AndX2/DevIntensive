@@ -29,4 +29,10 @@
     <string name="enter_success">Вход выполнен!</string>
     <string name="login_pass_is_wrong">Неверный логин или пароль!</string>
     <string name="error_other_login">Неизвестная ошибка!</string>
+
+    <!-- Font family -->
+    <string name="ff_regular">sans-serif</string>
+    <string name="ff_medium">sans-serif-medium</string>
+    <string name="capture_view_more">Просмотр</string>
+
 </resources>

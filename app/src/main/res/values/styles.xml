@@ -47,5 +47,11 @@
         <item name="android:background">@color/colorAccent</item>
     </style>
 
+    <!--Toolbar-->
+    <style name="ToolBarStyle" parent="Theme.AppCompat">
+        <!--<item name="textColorPrimary">@color/white</item>-->
+        <!--<item name="textColorSecondary">@color/white</item>-->
+        <!--<item name="actionMenuTextColor">@color/white</item>-->
+    </style>
 
 </resources>
