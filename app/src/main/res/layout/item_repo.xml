@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/phone_icon_avatar_left_margin_72"
+    android:orientation="vertical">
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/phone_icon_avatar_left_margin_72"
+        android:layout_centerVertical="true">
+
+        <EditText
+            android:id="@+id/et_item_git"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:focusable="false"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="@string/hint_repo"
+            android:inputType="textEmailAddress"
+            android:text="@string/hint_git_repo"
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/text_body1_size_14"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <ImageView
+        android:id="@+id/btn_item_git"
+        style="@style/icon.right"
+        android:src="@drawable/ic_remove_red_eye_black_24dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>

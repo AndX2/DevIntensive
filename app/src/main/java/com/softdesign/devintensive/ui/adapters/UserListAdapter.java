@@ -81,6 +81,8 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
         public UserListViewHolder(View itemView, CustomClickListener clickListener) {
             super(itemView);
 
+            mListener = clickListener;
+
             imgUserPhoto = (AspectRatioImageView) itemView.findViewById(R.id.img_item_user_photo);
             tvFullName= (TextView)itemView.findViewById(R.id.user_full_name_txt);
             tvRatio = (TextView)itemView.findViewById(R.id.tv_item_ratio);

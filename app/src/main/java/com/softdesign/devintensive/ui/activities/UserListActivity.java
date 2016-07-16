@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,8 +20,10 @@ import android.view.MenuItem;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
+import com.softdesign.devintensive.utils.ConstantManager;
 
 import java.util.ArrayList;
 
@@ -60,7 +63,7 @@ public class UserListActivity extends BaseActivity {
 
         setupToolbar();
         setupDrawer();
-        
+
         loadUsers();
 
 
@@ -88,9 +91,21 @@ public class UserListActivity extends BaseActivity {
             @Override
             public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
                 Log.d("UserListTag", "onResponse");
-                if (response.code() == 200){
+                if (response.code() == 200) {
                     mUsers = response.body().getData();
-                    mRecyclerView.setAdapter(new UserListAdapter(mUsers));
+                    mRecyclerView.setAdapter(new UserListAdapter(mUsers,
+                            new UserListAdapter.UserListViewHolder.CustomClickListener() {
+
+                                @Override
+                                public void onUserItemClickListener(int position) {
+                                    Log.d("UserListTag", "user picked pos: " + position);
+                                    UserDTO userDto = new UserDTO(mUsers.get(position));
+
+                                    Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                                    profileIntent.putExtra(ConstantManager.PARCEL_USER_KEY, userDto);
+                                    startActivity(profileIntent);
+                                }
+                            }));
                 }
             }
 
@@ -104,7 +119,7 @@ public class UserListActivity extends BaseActivity {
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null){
+        if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -112,6 +127,6 @@ public class UserListActivity extends BaseActivity {
     }
 
     private void setupDrawer() {
-       
+
     }
 }
