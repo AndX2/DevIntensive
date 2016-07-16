@@ -43,7 +43,7 @@ public class NetworkManager {
         return mRestService.uploadUserPhoto(userId, photo);
     }
 
-    public Call<ArrayList<UserListRes>> getUserList(){
+    public Call<UserListRes> getUserList(){
         return mRestService.getUserList();
     }
 

@@ -13,72 +13,89 @@ import java.util.List;
 
 public class UserListRes {
 
+    @SerializedName("success")
+    @Expose
+    private boolean success;
 
-    @SerializedName("_id")
+    @SerializedName("data")
     @Expose
-    private String id;
-    @SerializedName("first_name")
-    @Expose
-    private String firstName;
-    @SerializedName("second_name")
-    @Expose
-    private String secondName;
-    @SerializedName("__v")
-    @Expose
-    private Integer v;
-    @SerializedName("repositories")
-    @Expose
-    private UserProfile.Repositories repositories;
-    @SerializedName("profileValues")
-    @Expose
-    private UserProfile.ProfileValues profileValues;
-    @SerializedName("publicInfo")
-    @Expose
-    private UserProfile.PublicInfo publicInfo;
-    @SerializedName("specialization")
-    @Expose
-    public String specialization;
-    @SerializedName("updated")
-    @Expose
-    private String updated;
+    private ArrayList<Data> data = new ArrayList<Data>();
 
-    public String getId() {
-        return id;
+    public ArrayList<Data> getData() {
+        return data;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
 
-    public String getSecondName() {
-        return secondName;
-    }
+    public class Data {
 
-    public UserProfile.Repositories getRepositories() {
-        return repositories;
-    }
 
-    public UserProfile.ProfileValues getProfileValues() {
-        return profileValues;
-    }
+        @SerializedName("_id")
+        @Expose
+        private String id;
+        @SerializedName("first_name")
+        @Expose
+        private String firstName;
+        @SerializedName("second_name")
+        @Expose
+        private String secondName;
+        @SerializedName("__v")
+        @Expose
+        private Integer v;
+        @SerializedName("repositories")
+        @Expose
+        private UserProfile.Repositories repositories;
+        @SerializedName("profileValues")
+        @Expose
+        private UserProfile.ProfileValues profileValues;
+        @SerializedName("publicInfo")
+        @Expose
+        private UserProfile.PublicInfo publicInfo;
+        @SerializedName("specialization")
+        @Expose
+        public String specialization;
+        @SerializedName("updated")
+        @Expose
+        private String updated;
 
-    public UserProfile.PublicInfo getPublicInfo() {
-        return publicInfo;
-    }
+        public String getId() {
+            return id;
+        }
 
-    public String getSpecialization() {
-        return specialization;
-    }
+        public String getFirstName() {
+            return firstName;
+        }
 
-    public String getUpdated() {
-        return updated;
-    }
+        public String getSecondName() {
+            return secondName;
+        }
 
-    public Integer getV() {
-        return v;
-    }
+        public UserProfile.Repositories getRepositories() {
+            return repositories;
+        }
 
-    public String getFullName(){
-        return firstName + " " + secondName;
+        public UserProfile.ProfileValues getProfileValues() {
+            return profileValues;
+        }
+
+        public UserProfile.PublicInfo getPublicInfo() {
+            return publicInfo;
+        }
+
+        public String getSpecialization() {
+            return specialization;
+        }
+
+        public String getUpdated() {
+            return updated;
+        }
+
+        public Integer getV() {
+            return v;
+        }
+
+        public String getFullName() {
+            return firstName + " " + secondName;
+        }
+
     }
 }

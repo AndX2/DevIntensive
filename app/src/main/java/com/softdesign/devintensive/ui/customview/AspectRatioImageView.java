@@ -7,14 +7,10 @@ import android.widget.ImageView;
 
 import com.softdesign.devintensive.R;
 
-/**
- * Created by savos on 15.07.2016.
- */
-
 public class AspectRatioImageView extends ImageView {
-    private static final float DEFAULT_ASPECT_RATIO = 1.78f;
-    private final float mAspectRatio;
 
+    private static final float DEFAULT_ASPECT_RATIO = 1.78f;
+    private float mAspectRatio;
 
     public AspectRatioImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -26,12 +22,12 @@ public class AspectRatioImageView extends ImageView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int newWidth;
         int newHeight;
 
         newWidth = getMeasuredWidth();
-        newHeight = (int) (newWidth/ mAspectRatio);
+        newHeight = (int) (newWidth/mAspectRatio);
 
         setMeasuredDimension(newWidth, newHeight);
     }

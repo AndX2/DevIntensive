@@ -10,8 +10,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.softdesign.devintensive.R;
@@ -39,7 +42,7 @@ public class UserListActivity extends BaseActivity {
 
     private DataManager mDataManager;
 
-    private ArrayList<UserListRes> mUsers;
+    private ArrayList<UserListRes.Data> mUsers;
 
 
     @Override
@@ -51,6 +54,9 @@ public class UserListActivity extends BaseActivity {
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.list_coordinator_layout);
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.list_drawer_layout);
         mToolbar = (Toolbar) findViewById(R.id.list_toolbar);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(layoutManager);
 
         setupToolbar();
         setupDrawer();
@@ -76,23 +82,22 @@ public class UserListActivity extends BaseActivity {
 
 
     private void loadUsers() {
-        Call<ArrayList<UserListRes>> call = DataManager.getInstance().getNetworkManager().getUserList();
-        call.enqueue(new Callback<ArrayList<UserListRes>>() {
+        Log.d("UserListTag", "loadUsers");
+        Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserList();
+        call.enqueue(new Callback<UserListRes>() {
             @Override
-            public void onResponse(Call<ArrayList<UserListRes>> call, Response<ArrayList<UserListRes>> response) {
-                if (response.code() == 200) {
-                    mUsers = response.body();
-                    mUserListAdapter = new UserListAdapter(mUsers);
-                    mRecyclerView.setAdapter(mUserListAdapter);
-                }else showSnackbar("wrong response: " + response.code());
+            public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
+                Log.d("UserListTag", "onResponse");
+                if (response.code() == 200){
+                    mUsers = response.body().getData();
+                    mRecyclerView.setAdapter(new UserListAdapter(mUsers));
+                }
             }
 
             @Override
-            public void onFailure(Call<ArrayList<UserListRes>> call, Throwable t) {
+            public void onFailure(Call<UserListRes> call, Throwable t) {
 
             }
-
-
         });
     }
 

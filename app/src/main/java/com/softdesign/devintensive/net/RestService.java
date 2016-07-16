@@ -31,7 +31,7 @@ public interface RestService {
     Call<ResponseBody> uploadUserPhoto(@Path("userId") String userId, @Part MultipartBody.Part photo);
 
     @GET("user/list?orderBy=rating")
-    Call<ArrayList<UserListRes>> getUserList();
+    Call<UserListRes> getUserList();
 
 
 }

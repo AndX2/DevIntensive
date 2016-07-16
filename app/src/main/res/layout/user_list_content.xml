@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:paddingLeft="@dimen/phone_height_between_content_areas_8"
+    android:paddingTop="@dimen/phone_toolbar_height_56"
     android:paddingRight="@dimen/phone_height_between_content_areas_8">
 
 </android.support.v7.widget.RecyclerView>
