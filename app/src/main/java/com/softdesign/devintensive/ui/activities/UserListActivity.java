@@ -1,17 +1,13 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -86,7 +82,7 @@ public class UserListActivity extends BaseActivity {
 
     private void loadUsers() {
         Log.d("UserListTag", "loadUsers");
-        Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserList();
+        Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserListFromNetwork();
         call.enqueue(new Callback<UserListRes>() {
             @Override
             public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {

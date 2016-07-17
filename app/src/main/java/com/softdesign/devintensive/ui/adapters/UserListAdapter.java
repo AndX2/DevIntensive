@@ -1,7 +1,9 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +11,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.softdesign.devintensive.DevIntensiveApplication;
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.ui.customview.AspectRatioImageView;
+import com.softdesign.devintensive.utils.ConstantManager;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -21,6 +28,8 @@ import java.util.List;
  */
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserListViewHolder> {
+
+    static final String TAG = ConstantManager.TAG_USER_LIST_ADAPTER;
 
     public UserListAdapter(List<UserListRes.Data> userListRes, UserListViewHolder.CustomClickListener clickListener) {
         mUserList = userListRes;
@@ -40,14 +49,50 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
     }
 
     @Override
-    public void onBindViewHolder(UserListAdapter.UserListViewHolder holder, int position) {
+    public void onBindViewHolder(final UserListAdapter.UserListViewHolder holder, int position) {
 
-        UserListRes.Data user = mUserList.get(position);
-        Picasso.with(mContext)
-                .load(user.getPublicInfo().getPhoto())
-                .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .error(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .into(holder.imgUserPhoto);
+        final Picasso picasso = DataManager.getInstance().getNetworkManager().getPicasso();
+        final UserListRes.Data user = mUserList.get(position);
+        //replace bad or null link to "null" is not work. picasso.load("null") -> Fatal exception
+        try {
+            picasso.with(mContext)
+                    .load(user.getPublicInfo().getPhoto())
+                    .placeholder(holder.stubPhoto)
+                    .fit()
+                    .centerCrop()
+                    .error(holder.stubPhoto)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(holder.imgUserPhoto, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+                            picasso.with(mContext)
+                                    .load(user.getPublicInfo().getPhoto())
+                                    .placeholder(holder.stubPhoto)
+                                    .fit()
+                                    .centerCrop()
+                                    .error(holder.stubPhoto)
+                                    .into(holder.imgUserPhoto, new Callback() {
+                                        @Override
+                                        public void onSuccess() {
+
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Log.d(TAG, "impossible load photo for user: " + user.getFullName());
+                                        }
+                                    });
+
+                        }
+                    });
+        }catch (Exception e){
+            Log.d(TAG, "bad photo link user: " + user.getFullName());
+        }
 
         holder.tvFullName.setText(user.getFullName());
         holder.tvRatio.setText(user.getProfileValues().getRait() + "");
@@ -69,12 +114,16 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
         return mUserList.size();
     }
 
+
+
+
     public static class UserListViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
         private AspectRatioImageView imgUserPhoto;
         private TextView tvFullName, tvRatio, tvCodeLines, tvProjects, tvBio;
         private Button btnViewMore;
+        private Drawable stubPhoto;
 
         private CustomClickListener mListener;
 
@@ -82,6 +131,8 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
             super(itemView);
 
             mListener = clickListener;
+
+            stubPhoto = DevIntensiveApplication.getAppContext().getResources().getDrawable(R.drawable.user_bg);
 
             imgUserPhoto = (AspectRatioImageView) itemView.findViewById(R.id.img_item_user_photo);
             tvFullName= (TextView)itemView.findViewById(R.id.user_full_name_txt);

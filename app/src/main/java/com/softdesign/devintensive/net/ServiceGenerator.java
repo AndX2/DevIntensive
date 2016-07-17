@@ -1,8 +1,13 @@
 package com.softdesign.devintensive.net;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.softdesign.devintensive.DevIntensiveApplication;
 import com.softdesign.devintensive.net.interceptors.HeaderInterceptors;
 import com.softdesign.devintensive.utils.AppConfig;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -26,6 +31,11 @@ public class ServiceGenerator {
 
         httpClient.addInterceptor(logging);
         httpClient.addInterceptor(new HeaderInterceptors());
+        httpClient.connectTimeout(AppConfig.MAX_CONNECY_TIMEOUT, TimeUnit.MILLISECONDS);
+        httpClient.readTimeout(AppConfig.MAX_READ_TIMEOUT, TimeUnit.MILLISECONDS);
+        httpClient.cache(new Cache(DevIntensiveApplication.getAppContext().getCacheDir(), Integer.MAX_VALUE));
+        httpClient.addNetworkInterceptor(new StethoInterceptor());
+
 
         Retrofit retrofit = sBuilder
                 .client(httpClient.build())

@@ -42,4 +42,5 @@ public interface ConstantManager {
 
 
     String PARCEL_USER_KEY = "Parcel userDTO key";
+    String TAG_USER_LIST_ADAPTER = "LogTagUserListAdapter";
 }

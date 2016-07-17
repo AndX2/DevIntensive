@@ -1,11 +1,13 @@
 package com.softdesign.devintensive.data.managers;
 
+import com.softdesign.devintensive.net.PicassoCache;
 import com.softdesign.devintensive.net.RestService;
 import com.softdesign.devintensive.net.ServiceGenerator;
 import com.softdesign.devintensive.net.request.UserLoginRequest;
 import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.utils.GsonHelper;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +23,12 @@ import retrofit2.Call;
 public class NetworkManager {
 
     private static NetworkManager instance;
-
-    private static RestService mRestService;
+    private  Picasso mPicasso;
+    private  RestService mRestService;
 
     private NetworkManager(){
         mRestService = ServiceGenerator.createService(RestService.class);
+        mPicasso = PicassoCache.getPicassoInstance();
     }
 
     synchronized public static NetworkManager getInstance(){
@@ -33,6 +36,11 @@ public class NetworkManager {
             instance = new NetworkManager();
         }
         return instance;
+    }
+
+    //region ==============Network======================
+    public Picasso getPicasso(){
+        return mPicasso;
     }
 
     public Call<UserProfile> loginUser(UserLoginRequest userLoginRequest){
@@ -43,8 +51,12 @@ public class NetworkManager {
         return mRestService.uploadUserPhoto(userId, photo);
     }
 
-    public Call<UserListRes> getUserList(){
+    public Call<UserListRes> getUserListFromNetwork(){
         return mRestService.getUserList();
     }
+
+    //endregion
+
+
 
 }
