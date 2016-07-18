@@ -1,14 +1,19 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.view.View;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
@@ -17,6 +22,8 @@ import com.softdesign.devintensive.utils.ConstantManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+
 
 public class ProfileUserActivity extends BaseActivity {
 
@@ -27,6 +34,8 @@ public class ProfileUserActivity extends BaseActivity {
     CollapsingToolbarLayout mCollapsingToolbarLayout;
 
     ListView mRepoListView;
+
+    UserDTO userDto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +69,12 @@ public class ProfileUserActivity extends BaseActivity {
     }
 
     private void initProfileUser() {
-        UserDTO userDto = getIntent().getParcelableExtra(ConstantManager.PARCEL_USER_KEY);
+        userDto = getIntent().getParcelableExtra(ConstantManager.PARCEL_USER_KEY);
 
         final List<String> repositories = userDto.getRepositories();
         RepoAdapter repoAdapter = new RepoAdapter(repositories, this);
         mRepoListView.setAdapter(repoAdapter);
+        setListGitHeight(mRepoListView);
         mRait.setText(userDto.getRating());
         mCodeLines.setText(userDto.getCodeLines());
         mProjects.setText(userDto.getProjects());
@@ -76,5 +86,24 @@ public class ProfileUserActivity extends BaseActivity {
                 .error(R.drawable.user_bg)
                 .placeholder(R.drawable.user_bg)
                 .into(profilePhoto);
+    }
+
+    private static void setListGitHeight(ListView listView){
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        View view = listAdapter.getView(0, null, listView);
+
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+
+        int totalHeight = view.getMeasuredHeight() * listAdapter.getCount();
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 }

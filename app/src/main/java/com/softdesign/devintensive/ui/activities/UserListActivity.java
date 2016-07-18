@@ -16,12 +16,14 @@ import android.view.MenuItem;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,11 +39,7 @@ public class UserListActivity extends BaseActivity {
     private Toolbar mToolbar;
     private DrawerLayout mNavigationDrawer;
     private RecyclerView mRecyclerView;
-    private UserListAdapter mUserListAdapter;
-
-    private DataManager mDataManager;
-
-    private ArrayList<UserListRes.Data> mUsers;
+    private List<User> mUserList;
 
 
     @Override
@@ -60,7 +58,7 @@ public class UserListActivity extends BaseActivity {
         setupToolbar();
         setupDrawer();
 
-        loadUsers();
+        loadUsersFromDb();
 
 
     }
@@ -80,37 +78,24 @@ public class UserListActivity extends BaseActivity {
     }
 
 
-    private void loadUsers() {
-        Log.d("UserListTag", "loadUsers");
-        Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserListFromNetwork();
-        call.enqueue(new Callback<UserListRes>() {
-            @Override
-            public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
-                Log.d("UserListTag", "onResponse");
-                if (response.code() == 200) {
-                    mUsers = response.body().getData();
-                    mRecyclerView.setAdapter(new UserListAdapter(mUsers,
-                            new UserListAdapter.UserListViewHolder.CustomClickListener() {
+    private void loadUsersFromDb(){
+        mUserList = DataManager.getInstance().getDaoSession().getUserDao().loadAll();
+        Log.d("UserListTag", "loadUsersFromDb");
+        mRecyclerView.setAdapter(new UserListAdapter(mUserList,
+                new UserListAdapter.UserListViewHolder.CustomClickListener() {
 
-                                @Override
-                                public void onUserItemClickListener(int position) {
-                                    Log.d("UserListTag", "user picked pos: " + position);
-                                    UserDTO userDto = new UserDTO(mUsers.get(position));
+                    @Override
+                    public void onUserItemClickListener(int position) {
+                        Log.d("UserListTag", "user picked pos: " + position);
+                        UserDTO userDto = new UserDTO(mUserList.get(position));
 
-                                    Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                                    profileIntent.putExtra(ConstantManager.PARCEL_USER_KEY, userDto);
-                                    startActivity(profileIntent);
-                                }
-                            }));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<UserListRes> call, Throwable t) {
-
-            }
-        });
+                        Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                        profileIntent.putExtra(ConstantManager.PARCEL_USER_KEY, userDto);
+                        startActivity(profileIntent);
+                    }
+                }));
     }
+
 
     private void setupToolbar() {
         setSupportActionBar(mToolbar);

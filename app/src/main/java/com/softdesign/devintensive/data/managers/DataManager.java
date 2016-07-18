@@ -14,6 +14,8 @@ public class DataManager {
     private static DataManager instance = null;
     private PreferenceManager mPreferenceManager;
     private NetworkManager mNetworkManager;
+    private StorageManager mStorageManager;
+
     private DaoSession mDaoSession;
 
 
@@ -39,5 +41,12 @@ public class DataManager {
         return mNetworkManager;
     }
 
+    public DaoSession getDaoSession() {
+        return mDaoSession;
+    }
 
+    public StorageManager getStorageManager() {
+        if(mStorageManager == null) mStorageManager = StorageManager.getInstance();
+        return mStorageManager;
+    }
 }

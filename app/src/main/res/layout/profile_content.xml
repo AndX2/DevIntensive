@@ -38,7 +38,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/phone_list_item_height_72"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <ImageView

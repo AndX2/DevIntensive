@@ -22,7 +22,12 @@ import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.Repositiry;
+import com.softdesign.devintensive.data.storage.models.RepositiryDao;
+import com.softdesign.devintensive.data.storage.models.User;
+import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.net.request.UserLoginRequest;
+import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.GsonHelper;
@@ -43,7 +48,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -68,8 +75,10 @@ public class AuthActivity extends AppCompatActivity {
     Button mBtnEnter;
     @BindView(R.id.card_auth)
     CardView mCardView;
-    Context context;
-    Context appContext;
+
+    private UserProfile mUserProfile;
+    private RepositiryDao mRepositiryDao;
+    private UserDao mUserDao;
 
 
     @Override
@@ -77,25 +86,35 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
-        UserProfile userProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
-        if (userProfile != null)
-            mUserEmailAuth.setText(userProfile.getData().getUser().getContacts().getEmail());
+        mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
 
-        mUserEmailAuth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                boolean isValid = TextValueValidator.validate(TextValueValidator.Type.Email, mUserEmailAuth.getText().toString());
-                if (!b) {
-                    if (!isValid) {
-                        mUserEmailAuth.setTextColor(Color.RED);
-                        showSnackbar(getString(R.string.error_email_value_message));
+        mUserDao = DataManager.getInstance().getDaoSession().getUserDao();
+        mRepositiryDao = DataManager.getInstance().getDaoSession().getRepositiryDao();
+
+        //If user login early - fill field eMail and set it validator util
+        if (mUserProfile != null) {
+            mUserEmailAuth.setText(mUserProfile.getData().getUser().getContacts().getEmail());
+            mUserEmailAuth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    boolean isValid = TextValueValidator.validate(TextValueValidator.Type.Email, mUserEmailAuth.getText().toString());
+                    if (!b) {
+                        if (!isValid) {
+                            mUserEmailAuth.setTextColor(Color.RED);
+                            showSnackbar(getString(R.string.error_email_value_message));
+                        }
+                    } else {
+                        mUserEmailAuth.setTextColor(Color.BLACK);
+                        if (!isValid) mUserEmailAuth.setText("");
                     }
-                } else {
-                    mUserEmailAuth.setTextColor(Color.BLACK);
-                    if (!isValid) mUserEmailAuth.setText("");
                 }
+            });
+            //if userProfile contain token - get user list
+            if ((mUserProfile.getData().getToken() != null) && (mUserProfile.getData().getToken().length() > 10)) {
+                loadUserList();
             }
-        });
+        }
+
     }
 
     @Override
@@ -127,18 +146,12 @@ public class AuthActivity extends AppCompatActivity {
                 break;
             case R.id.btn_auth:
                 logIn();
-//                String[] authInfo = {mUserEmailAuth.getText().toString(),
-//                        mUserPassAuth.getText().toString()};
-//                AsyncPostAuth asyncPostAuth = new AsyncPostAuth();
-//                asyncPostAuth.execute(authInfo);
                 break;
             case R.id.tv_forgot_pass:
                 rememberPass();
                 break;
         }
-
     }
-
 
     private void showSnackbar(String message) {
         Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
@@ -166,9 +179,46 @@ public class AuthActivity extends AppCompatActivity {
         showSnackbar(getString(R.string.enter_success));
         DataManager.getInstance().getPreferenceManager().saveUserProfile(response.body());
         startMainActivity();
-//        showSnackbar(response.body().getData().getToken());
-//        String json = GsonHelper.getJsonFromObject(response.body(), UserProfile.class);
-//        Log.d(TAG, json);
+    }
+
+    private void loadUserList(){
+        Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserListFromNetwork();
+        call.enqueue(new Callback<UserListRes>() {
+            @Override
+            public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
+                try {
+                    if (response.code() == HttpURLConnection.HTTP_OK){
+                        List<Repositiry> allRepo = new ArrayList<>();
+                        List<User> allUsers = new ArrayList<>();
+
+                        for (UserListRes.Data userRes: response.body().getData()) {
+                            allRepo.addAll(getRepoListFromUser(userRes));
+                            allUsers.add(new User(userRes));
+
+                        }
+
+                        mRepositiryDao.insertOrReplaceInTx(allRepo, true);
+                        mUserDao.insertOrReplaceInTx(allUsers);
+                    }
+                }catch (NullPointerException e){
+                    Log.d(TAG, "loadUserList NPE: " + e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserListRes> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private List<Repositiry> getRepoListFromUser(UserListRes.Data userRes){
+        final String userId = userRes.getId();
+        List<Repositiry> tmpList = new ArrayList<>();
+        for (UserProfile.Repo repo: userRes.getRepositories().getRepo()) {
+            tmpList.add(new Repositiry(repo, userId));
+        }
+        return tmpList;
     }
 
     private void logIn() {
@@ -181,6 +231,7 @@ public class AuthActivity extends AppCompatActivity {
                 if (response.code() == 200) {
                     loginSuccess(response);
                 } else if (response.code() == 404) {
+                    flashError();
                     showSnackbar(getString(R.string.login_pass_is_wrong));
                 } else {
                     showSnackbar(getString(R.string.error_other_login));
@@ -197,7 +248,7 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     private void startMainActivity() {
-        startActivity(new Intent(AuthActivity.this, MainActivity.class));
+        startActivity(new Intent(AuthActivity.this, UserListActivity.class));
 
     }
 

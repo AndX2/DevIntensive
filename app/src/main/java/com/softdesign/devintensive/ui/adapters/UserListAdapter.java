@@ -14,7 +14,9 @@ import android.widget.TextView;
 import com.softdesign.devintensive.DevIntensiveApplication;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.net.response.UserListRes;
+import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.AspectRatioImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.squareup.picasso.Callback;
@@ -31,15 +33,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
 
     static final String TAG = ConstantManager.TAG_USER_LIST_ADAPTER;
 
-    public UserListAdapter(List<UserListRes.Data> userListRes, UserListViewHolder.CustomClickListener clickListener) {
-        mUserList = userListRes;
+    public UserListAdapter(List<User> userList, UserListViewHolder.CustomClickListener clickListener) {
+        mUserList = userList;
         this.mClickListener = clickListener;
     }
 
     Context mContext;
     private UserListViewHolder.CustomClickListener mClickListener;
 
-    private List<UserListRes.Data> mUserList;
+    private List<User> mUserList;
 
     @Override
     public UserListAdapter.UserListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -52,11 +54,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
     public void onBindViewHolder(final UserListAdapter.UserListViewHolder holder, int position) {
 
         final Picasso picasso = DataManager.getInstance().getNetworkManager().getPicasso();
-        final UserListRes.Data user = mUserList.get(position);
+        final User user = mUserList.get(position);
         //replace bad or null link to "null" is not work. picasso.load("null") -> Fatal exception
         try {
             picasso.with(mContext)
-                    .load(user.getPublicInfo().getPhoto())
+                    .load(user.getPhoto())
                     .placeholder(holder.stubPhoto)
                     .fit()
                     .centerCrop()
@@ -71,7 +73,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
                         @Override
                         public void onError() {
                             picasso.with(mContext)
-                                    .load(user.getPublicInfo().getPhoto())
+                                    .load(user.getPhoto())
                                     .placeholder(holder.stubPhoto)
                                     .fit()
                                     .centerCrop()
@@ -95,15 +97,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
         }
 
         holder.tvFullName.setText(user.getFullName());
-        holder.tvRatio.setText(user.getProfileValues().getRait() + "");
-        holder.tvCodeLines.setText(user.getProfileValues().getLinesCode() + "");
-        holder.tvProjects.setText(user.getProfileValues().getProjects() + "");
+        holder.tvRatio.setText(user.getRaiting() + "");
+        holder.tvCodeLines.setText(user.getCodeLines() + "");
+        holder.tvProjects.setText(user.getProjects() + "");
 
-        if ((user.getPublicInfo().getBio() == null) ||(user.getPublicInfo().getBio() == "")){
+        if ((user.getBio() == null) ||(user.getBio() == "")){
             holder.tvBio.setVisibility(View.GONE);
         }else {
             holder.tvBio.setVisibility(View.VISIBLE);
-            holder.tvBio.setText(user.getPublicInfo().getBio());
+            holder.tvBio.setText(user.getBio());
 
         }
 

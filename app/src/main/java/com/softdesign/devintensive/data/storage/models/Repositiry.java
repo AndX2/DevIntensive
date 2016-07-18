@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.data.storage.models;
 
+import com.softdesign.devintensive.pojo.UserProfile;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
@@ -11,7 +13,7 @@ import org.greenrobot.greendao.DaoException;
 public class Repositiry {
 
     @Id
-    private long id;
+    private Long id;
 
     @NotNull
     @Unique
@@ -20,6 +22,20 @@ public class Repositiry {
     private String repositoryName;
 
     private String userRemoteId;
+
+    /** Used for active entity operations. */
+    @Generated(hash = 794600576)
+    private transient RepositiryDao myDao;
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+
+    public Repositiry(UserProfile.Repo repo, String userId) {
+        this.repositoryName = repo.getGit();
+        this.userRemoteId = userId;
+        this.remoteId = repo.getId();
+    }
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
@@ -64,14 +80,6 @@ public class Repositiry {
         myDao = daoSession != null ? daoSession.getRepositiryDao() : null;
     }
 
-    /** Used for active entity operations. */
-    @Generated(hash = 794600576)
-    private transient RepositiryDao myDao;
-
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-
     public String getUserRemoteId() {
         return this.userRemoteId;
     }
@@ -96,16 +104,16 @@ public class Repositiry {
         this.remoteId = remoteId;
     }
 
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    @Generated(hash = 556300298)
-    public Repositiry(long id, @NotNull String remoteId, String repositoryName,
+    @Generated(hash = 562795200)
+    public Repositiry(Long id, @NotNull String remoteId, String repositoryName,
             String userRemoteId) {
         this.id = id;
         this.remoteId = remoteId;
@@ -116,7 +124,6 @@ public class Repositiry {
     @Generated(hash = 349257576)
     public Repositiry() {
     }
-
 
 
 }

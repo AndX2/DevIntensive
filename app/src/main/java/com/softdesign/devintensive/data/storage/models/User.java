@@ -1,6 +1,8 @@
 package com.softdesign.devintensive.data.storage.models;
 
 
+import com.softdesign.devintensive.net.response.UserListRes;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.JoinProperty;
@@ -16,7 +18,7 @@ import org.greenrobot.greendao.DaoException;
 public class User {
 
     @Id
-    private long id;
+    private Long id;
 
     @NotNull
     @Unique
@@ -42,8 +44,27 @@ public class User {
 
     @ToMany(joinProperties = {
             @JoinProperty(name = "remoteId", referencedName = "userRemoteId")
-    } )
+    })
     private List<Repositiry> repositiries;
+
+    /** Used for active entity operations. */
+    @Generated(hash = 1507654846)
+    private transient UserDao myDao;
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+
+    public User(UserListRes.Data userRes) {
+        this.remoteId = userRes.getId();
+        this.photo = userRes.getPublicInfo().getPhoto();
+        this.fullName = userRes.getFullName();
+        this.searchName = this.fullName.toUpperCase();
+        this.raiting = userRes.getProfileValues().getRait();
+        this.codeLines = userRes.getProfileValues().getLinesCode();
+        this.projects = userRes.getProfileValues().getProjects();
+        this.bio = userRes.getPublicInfo().getBio();
+    }
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
@@ -116,14 +137,6 @@ public class User {
         myDao = daoSession != null ? daoSession.getUserDao() : null;
     }
 
-    /** Used for active entity operations. */
-    @Generated(hash = 1507654846)
-    private transient UserDao myDao;
-
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-
     public String getBio() {
         return this.bio;
     }
@@ -188,16 +201,16 @@ public class User {
         this.remoteId = remoteId;
     }
 
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    @Generated(hash = 576108756)
-    public User(long id, @NotNull String remoteId, String photo,
+    @Generated(hash = 1713564786)
+    public User(Long id, @NotNull String remoteId, String photo,
             @NotNull String fullName, @NotNull String searchName, int raiting,
             int codeLines, int projects, String bio) {
         this.id = id;
@@ -214,6 +227,4 @@ public class User {
     @Generated(hash = 586692638)
     public User() {
     }
-
-
 }

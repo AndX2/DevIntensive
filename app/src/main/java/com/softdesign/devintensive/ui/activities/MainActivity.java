@@ -39,9 +39,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.User;
+import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.AndroidDataHelper;
@@ -158,6 +161,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 //                .into(mUserProfilePhoto);
 
         onOffMaskInput(true);
+        List<User> users = DataManager.getInstance().getDaoSession().getUserDao().loadAll();
+        users.get(3);
+
 
     }
 
