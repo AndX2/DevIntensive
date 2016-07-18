@@ -1,7 +1,6 @@
 package com.softdesign.devintensive;
 
 import com.softdesign.devintensive.pojo.UserInfo;
-import com.softdesign.devintensive.utils.Jackson2Parser;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 
 import org.junit.Before;

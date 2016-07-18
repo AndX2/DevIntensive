@@ -23,7 +23,6 @@ import android.widget.LinearLayout;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.net.request.UserLoginRequest;
-import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.GsonHelper;
@@ -109,7 +108,7 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         mUserPassAuth.setText("");
     }
@@ -163,7 +162,7 @@ public class AuthActivity extends AppCompatActivity {
         }, ConstantManager.AUTH_ERROR_FLASH_DELAY);
     }
 
-    private void loginSuccess(Response<UserProfile> response){
+    private void loginSuccess(Response<UserProfile> response) {
         showSnackbar(getString(R.string.enter_success));
         DataManager.getInstance().getPreferenceManager().saveUserProfile(response.body());
         startMainActivity();
@@ -172,18 +171,18 @@ public class AuthActivity extends AppCompatActivity {
 //        Log.d(TAG, json);
     }
 
-    private void logIn(){
+    private void logIn() {
         Call<UserProfile> call = DataManager.getInstance().getNetworkManager()
                 .loginUser(new UserLoginRequest(mUserEmailAuth.getText().toString(),
                         mUserPassAuth.getText().toString()));
         call.enqueue(new Callback<UserProfile>() {
             @Override
             public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
-                if (response.code() == 200){
+                if (response.code() == 200) {
                     loginSuccess(response);
-                }else if(response.code() == 404){
+                } else if (response.code() == 404) {
                     showSnackbar(getString(R.string.login_pass_is_wrong));
-                }else{
+                } else {
                     showSnackbar(getString(R.string.error_other_login));
 
                 }

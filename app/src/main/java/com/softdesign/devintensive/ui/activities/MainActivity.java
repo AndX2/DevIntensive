@@ -42,7 +42,6 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.pojo.UserInfo;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.AndroidDataHelper;

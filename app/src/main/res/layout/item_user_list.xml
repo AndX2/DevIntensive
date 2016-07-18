@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/phone_height_between_content_areas_8"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/button_corner_radius_2">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.softdesign.devintensive.ui.customview.AspectRatioImageView
+                android:id="@+id/img_item_user_photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:src="@drawable/user_bg"
+
+                />
+
+            <!--app:aspect_ratio="1.78"-->
+
+
+
+            <TextView
+                android:id="@+id/user_full_name_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:fontFamily="@string/ff_medium"
+                android:paddingBottom="24dp"
+                android:paddingLeft="@dimen/phone_screen_left_and_right_margin_16"
+                android:paddingRight="@dimen/phone_screen_left_and_right_margin_16"
+                android:text="Full Name"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_headline_size_24"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/phone_list_item_height_72"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_item_ratio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:fontFamily="@string/ff_medium"
+                    android:textSize="@dimen/text_title_size_20"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/capture_ratio"
+                    android:fontFamily="@string/ff_medium"
+                    android:textSize="@dimen/text_body1_size_14"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:fontFamily="@string/ff_medium"
+                    android:textSize="@dimen/text_title_size_20"
+                    android:textColor="@color/black"
+                    android:gravity="center"
+                    android:id="@+id/tv_item_code_rows"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/caption_write_code"
+                    android:fontFamily="@string/ff_medium"
+                    android:textSize="@dimen/text_body1_size_14"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_item_projects"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:fontFamily="@string/ff_medium"
+                    android:textSize="@dimen/text_title_size_20"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/caption_projects"
+                    android:fontFamily="@string/ff_medium"
+                    android:textSize="@dimen/text_body1_size_14"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_item_bio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/myself"
+            android:paddingLeft="@dimen/phone_screen_left_and_right_margin_16"
+            android:paddingRight="@dimen/phone_screen_left_and_right_margin_16"
+            android:textSize="@dimen/text_button_size_14"
+            android:maxLines="3"
+            android:textColor="@color/grey_light"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey_light"
+            android:layout_marginTop="@dimen/phone_screen_left_and_right_margin_16"
+            android:layout_marginBottom="@dimen/phone_height_between_content_areas_8"/>
+        <Button
+            android:id="@+id/more_info_btn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/capture_view_more"
+            android:textColor="@color/colorAccent"
+            android:paddingLeft="@dimen/phone_screen_left_and_right_margin_16"
+            android:paddingRight="@dimen/phone_screen_left_and_right_margin_16"
+            />
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            >
+
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:contentScrim="@color/colorPrimary"
+                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/profile_image_size"
+                    android:fitsSystemWindows="true">
+
+                    <ImageView
+                        android:id="@+id/user_profile_placeholder_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/profile_image_size"
+                        android:fitsSystemWindows="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/user_photo"/>
+
+                </FrameLayout>
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    style="@style/toolbar_style"
+                    app:layout_collapseMode="pin"/>
+
+
+            </android.support.design.widget.CollapsingToolbarLayout>
+
+
+        </android.support.design.widget.AppBarLayout>
+
+        <LinearLayout
+            android:id="@+id/ratio_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ratio_placeholder_height"
+            android:background="@color/grey"
+            android:elevation="5dp"
+            android:orientation="horizontal"
+            app:layout_behavior="com.softdesign.devintensive.ui.customview.SubheaderBehavior">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_collapseMode="pin">
+
+                <TextView
+                    android:id="@+id/tv_ratio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="5"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_title_size_20"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/capture_ratio"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_caption_size_12"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/tablet_screen_left_and_right_margin_24"
+                android:layout_marginTop="@dimen/tablet_screen_left_and_right_margin_24"
+                android:background="@color/grey_light"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_collapseMode="pin">
+
+                <TextView
+                    android:id="@+id/tv_code_rows"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="25000"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_title_size_20"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/caption_write_code"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_caption_size_12"/>
+
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/tablet_screen_left_and_right_margin_24"
+                android:layout_marginTop="@dimen/tablet_screen_left_and_right_margin_24"
+                android:background="@color/grey_light"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_collapseMode="pin">
+
+                <TextView
+                    android:id="@+id/tv_projects"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="6"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_title_size_20"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/caption_projects"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_caption_size_12"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <include layout="@layout/profile_content"/>
+
+
+    </android.support.design.widget.CoordinatorLayout>
+

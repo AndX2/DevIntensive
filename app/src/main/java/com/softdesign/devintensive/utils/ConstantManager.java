@@ -41,4 +41,5 @@ public interface ConstantManager {
     long AUTH_ERROR_FLASH_DELAY = 500;
 
 
+    String PARCEL_USER_KEY = "Parcel userDTO key";
 }
