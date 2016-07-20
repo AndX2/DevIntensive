@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -44,6 +45,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.softdesign.devintensive.DevIntensiveApplication;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.User;
@@ -54,6 +56,7 @@ import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.AndroidDataHelper;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.vicmikhailau.maskededittext.MaskedWatcher;
 
@@ -85,6 +88,8 @@ import static com.softdesign.devintensive.utils.validator.TextValueValidator.*;
 
 
 public class MainActivity extends BaseActivity implements OnClickListener {
+
+    final String TAG = ConstantManager.TAG_PREFIX;
 
     DataManager mDataManager;
     int mCurrentEditMode = 0;
@@ -162,6 +167,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
         onOffMaskInput(true);
+
+        insertImage(Uri.parse(mUserProfile.getData().getUser().getPublicInfo().getPhoto()));
 
     }
 
@@ -377,6 +384,50 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 return false;
             }
         });
+        final RoundImageView imgAvatar = (RoundImageView)findViewById(R.id.iv_avatar);
+        final Picasso picasso = DataManager.getInstance().getNetworkManager().getPicasso();
+        final Drawable stubPhoto = DevIntensiveApplication.getAppContext().getResources().getDrawable(R.drawable.user_bg);
+        final String avatar = mUserProfile.getData().getUser().getPublicInfo().getAvatar();
+        try {
+            picasso.with(this)
+                    .load(avatar)
+                    .placeholder(stubPhoto)
+                    .fit()
+                    .centerCrop()
+                    .error(stubPhoto)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(imgAvatar, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+                            picasso.with(MainActivity.this)
+                                    .load(avatar)
+                                    .placeholder(stubPhoto)
+                                    .fit()
+                                    .centerCrop()
+                                    .error(stubPhoto)
+                                    .into(imgAvatar, new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Log.d(TAG, "impossible load avatar for user: " +
+                                                    mUserProfile.getData().getUser().getSecondName());
+                                        }
+                                    });
+
+                        }
+                    });
+        }catch (Exception e){
+            Log.d(TAG, "bad avatar link user: " + avatar);
+        }
     }
 
     static final ButterKnife.Setter<View, Boolean> Enabled = new ButterKnife.Setter<View, Boolean>() {
@@ -459,21 +510,21 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     }
 
-    private void loadUserInfoValues() {
-        List<String> userData = mDataManager.getPreferenceManager().loadUserProfileData();
-        for (int i = 0; i < userData.size(); i++) {
-            mUserInfo.get(i).setText(userData.get(i));
-        }
-
-    }
-
-    private void saveUserInfoValues() {
-        List<String> userData = new ArrayList<>();
-        for (EditText userFieldView : mUserInfo) {
-            userData.add(userFieldView.getText().toString());
-        }
-        mDataManager.getPreferenceManager().saveUserProfileData(userData);
-    }
+//    private void loadUserInfoValues() {
+//        List<String> userData = mDataManager.getPreferenceManager().loadUserProfileData();
+//        for (int i = 0; i < userData.size(); i++) {
+//            mUserInfo.get(i).setText(userData.get(i));
+//        }
+//
+//    }
+//
+//    private void saveUserInfoValues() {
+//        List<String> userData = new ArrayList<>();
+//        for (EditText userFieldView : mUserInfo) {
+//            userData.add(userFieldView.getText().toString());
+//        }
+//        mDataManager.getPreferenceManager().saveUserProfileData(userData);
+//    }
 
     private void loadPhotoFromGallery() {
         Intent takePhotoFromGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -525,12 +576,50 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         return image;
     }
 
-    private void insertImage(Uri selectedImageUri) {
+    private void insertImage(final Uri selectedImageUri) {
         //showSnackbar("insertImage" + selectedImageUri);
         mDataManager.getPreferenceManager().saveUserPhoto(selectedImageUri);
-        Picasso.with(this)
-                .load(selectedImageUri)
-                .into(mUserProfilePhoto);
+        final Picasso picasso = DataManager.getInstance().getNetworkManager().getPicasso();
+        final Drawable stubPhoto = DevIntensiveApplication.getAppContext().getResources().getDrawable(R.drawable.user_bg);
+        try {
+            picasso.with(this)
+                    .load(selectedImageUri)
+                    .placeholder(stubPhoto)
+                    .fit()
+                    .centerCrop()
+                    .error(stubPhoto)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(mUserProfilePhoto, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+                            picasso.with(MainActivity.this)
+                                    .load(selectedImageUri)
+                                    .placeholder(stubPhoto)
+                                    .fit()
+                                    .centerCrop()
+                                    .error(stubPhoto)
+                                    .into(mUserProfilePhoto, new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Log.d(TAG, "impossible load photo for owner");
+                                        }
+                                    });
+
+                        }
+                    });
+        }catch (Exception e){
+            Log.d(TAG, "bad photo link user: " + selectedImageUri);
+        }
     }
 
     public void openApplicationSetting() {

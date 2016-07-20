@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -13,29 +14,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.softdesign.devintensive.DevIntensiveApplication;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
-import com.softdesign.devintensive.data.storage.models.UserDao;
-import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
+import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogRecord;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by savos on 16.07.2016.
@@ -189,6 +185,51 @@ public class UserListActivity extends BaseActivity {
                 return false;
             }
         });
+        final RoundImageView imgAvatar = (RoundImageView)findViewById(R.id.iv_avatar);
+        final Picasso picasso = DataManager.getInstance().getNetworkManager().getPicasso();
+        final Drawable stubPhoto = DevIntensiveApplication.getAppContext().getResources().getDrawable(R.drawable.user_bg);
+        final String avatar = DataManager.getInstance().getPreferenceManager().loadUserProfile().getData().getUser().getPublicInfo().getAvatar();
+        try {
+            picasso.with(this)
+                    .load(avatar)
+                    .placeholder(stubPhoto)
+                    .fit()
+                    .centerCrop()
+                    .error(stubPhoto)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(imgAvatar, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+                            picasso.with(UserListActivity.this)
+                                    .load(avatar)
+                                    .placeholder(stubPhoto)
+                                    .fit()
+                                    .centerCrop()
+                                    .error(stubPhoto)
+                                    .into(imgAvatar, new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Log.d(TAG, "impossible load avatar for user: " +
+                                                    DataManager.getInstance().getPreferenceManager()
+                                                            .loadUserProfile().getData().getUser().getSecondName());
+                                        }
+                                    });
+
+                        }
+                    });
+        }catch (Exception e){
+            Log.d(TAG, "bad avatar link user: " + avatar);
+        }
 
     }
 }

@@ -129,11 +129,11 @@ public class ProfileUserActivity extends BaseActivity {
         }catch (Exception e){
             Log.d(TAG, "bad photo link user: " + userDto.getFullName());
         }
-        Picasso.with(this)
-                .load(userDto.getPhoto())
-                .error(R.drawable.user_bg)
-                .placeholder(R.drawable.user_bg)
-                .into(profilePhoto);
+//        Picasso.with(this)
+//                .load(userDto.getPhoto())
+//                .error(R.drawable.user_bg)
+//                .placeholder(R.drawable.user_bg)
+//                .into(profilePhoto);
     }
 
     private static void setListGitHeight(ListView listView){

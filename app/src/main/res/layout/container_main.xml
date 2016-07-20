@@ -39,7 +39,7 @@
                         android:layout_height="@dimen/profile_image_size"
                         android:fitsSystemWindows="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/user_photo"/>
+                        android:src="@drawable/user_bg"/>
 
                     <LinearLayout
                         android:id="@+id/photo_placeholder"

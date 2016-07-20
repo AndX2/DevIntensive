@@ -1,19 +1,12 @@
 package com.softdesign.devintensive.ui.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.util.JsonReader;
-import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +14,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.eventbus.UserListLoadedEvent;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.Repositiry;
 import com.softdesign.devintensive.data.storage.models.RepositiryDao;
@@ -30,28 +24,17 @@ import com.softdesign.devintensive.net.request.UserLoginRequest;
 import com.softdesign.devintensive.net.response.UserListRes;
 import com.softdesign.devintensive.pojo.UserProfile;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.GsonHelper;
-import com.softdesign.devintensive.utils.SecurityHelper;
 import com.softdesign.devintensive.utils.validator.TextValueValidator;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONStringer;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.greenrobot.eventbus.util.AsyncExecutor;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,9 +42,8 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.HTTP;
 
-public class AuthActivity extends AppCompatActivity {
+public class AuthActivity extends BaseActivity {
 
     public static final String TAG = "AuthActivityTag";
 
@@ -86,7 +68,24 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
+        super.showProgress();
         mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
+        if (mUserProfile != null){
+            super.showProgress();
+            AsyncExecutor.create().execute(new AsyncExecutor.RunnableEx() {
+                @Override
+                public void run() throws Exception {
+                    Thread thread = Thread.currentThread();
+                    //Delay for show "process" loading if network very fast
+                    thread.sleep(3000);
+                    List<User> userList = loadUserListSync();
+                    EventBus.getDefault().postSticky(new UserListLoadedEvent(userList));
+                }
+            });
+        }else{
+            mCardView.setVisibility(View.VISIBLE);
+        }
+
 
         mUserDao = DataManager.getInstance().getDaoSession().getUserDao();
         mRepositiryDao = DataManager.getInstance().getDaoSession().getRepositiryDao();
@@ -111,10 +110,29 @@ public class AuthActivity extends AppCompatActivity {
             });
             //if userProfile contain token - get user list
             if ((mUserProfile.getData().getToken() != null) && (mUserProfile.getData().getToken().length() > 10)) {
-                loadUserList();
+                loadUserListAsync();
             }
         }
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserListLoadedEvent(UserListLoadedEvent event){
+        super.hideProgress();
+        //mCardView.setVisibility(View.VISIBLE);
+        startMainActivity();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     @Override
@@ -146,7 +164,7 @@ public class AuthActivity extends AppCompatActivity {
                 break;
             case R.id.btn_auth:
 //                System.exit(1);
-                finish();
+//                finish();
                 logIn();
                 break;
             case R.id.tv_forgot_pass:
@@ -183,7 +201,30 @@ public class AuthActivity extends AppCompatActivity {
         startMainActivity();
     }
 
-    private void loadUserList(){
+    private List<User> loadUserListSync(){
+        List<User> allUsers = null;
+        Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserListFromNetwork();
+        try {
+            Response<UserListRes> response = call.execute();
+            if (response.code() == HttpURLConnection.HTTP_OK){
+                List<Repositiry> allRepo = new ArrayList<>();
+                allUsers = new ArrayList<>();
+                for (UserListRes.Data userRes: response.body().getData()) {
+                    allRepo.addAll(getRepoListFromUser(userRes));
+                    allUsers.add(new User(userRes));
+                }
+                mRepositiryDao.insertOrReplaceInTx(allRepo, true);
+                mUserDao.insertOrReplaceInTx(allUsers);
+            }
+
+        } catch (IOException e) {
+            showSnackbar("Невозможно загрузить список пользователей!");
+        }
+        return allUsers;
+    }
+
+
+    private void loadUserListAsync(){
         Call<UserListRes> call = DataManager.getInstance().getNetworkManager().getUserListFromNetwork();
         call.enqueue(new Callback<UserListRes>() {
             @Override
