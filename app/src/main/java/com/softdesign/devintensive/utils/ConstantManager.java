@@ -43,4 +43,7 @@ public interface ConstantManager {
 
     String PARCEL_USER_KEY = "Parcel userDTO key";
     String TAG_USER_LIST_ADAPTER = "LogTagUserListAdapter";
+    String TAG_PROFILE_USER = "Profile user activity";
+    String TAG_LIST_USER = "TagUserListActivity";
+    long SEARCH_LATENCY = 5000;
 }

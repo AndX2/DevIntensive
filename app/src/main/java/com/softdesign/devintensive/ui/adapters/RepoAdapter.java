@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
+import com.vicmikhailau.maskededittext.MaskedWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class RepoAdapter extends BaseAdapter{
     private List<String> mRepositories;
     private Context mContext;
     private LayoutInflater mInflater;
+    private List<EditText> editTexts = new ArrayList<>();
 
     public RepoAdapter(List<String> repositories, Context context) {
         mRepositories = repositories;
@@ -59,6 +61,7 @@ public class RepoAdapter extends BaseAdapter{
         }
         EditText repoName = (EditText) itemView.findViewById(R.id.et_item_git);
         repoName.setText(mRepositories.get(i));
+        editTexts.add(repoName);
         ImageView btnGit = (ImageView)itemView.findViewById(R.id.btn_item_git);
         btnGit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +75,21 @@ public class RepoAdapter extends BaseAdapter{
         });
         return itemView;
     }
+
+    public void setGitNamesEnabled(boolean isEnabled){
+        if(editTexts.isEmpty())return;
+        for (EditText editText:editTexts) {
+            editText.setEnabled(isEnabled);
+            editText.setFocusable(isEnabled);
+            editText.setFocusableInTouchMode(isEnabled);
+            if(isEnabled) {
+                editText.addTextChangedListener(new MaskedWatcher("github.com/*******************"));
+            }else {
+                editText.addTextChangedListener(new MaskedWatcher("***************************************"));
+            }
+        }
+    }
+
 
 
 

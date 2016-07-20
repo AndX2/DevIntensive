@@ -34,5 +34,7 @@
     <string name="ff_regular">sans-serif</string>
     <string name="ff_medium">sans-serif-medium</string>
     <string name="capture_view_more">Просмотр</string>
+    <string name="search_user">Поиск пользователя</string>
+    <string name="type_user_name">Введите имя пользователя</string>
 
 </resources>

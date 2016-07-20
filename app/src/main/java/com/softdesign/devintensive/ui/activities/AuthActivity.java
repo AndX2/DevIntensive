@@ -145,6 +145,8 @@ public class AuthActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.btn_auth:
+//                System.exit(1);
+                finish();
                 logIn();
                 break;
             case R.id.tv_forgot_pass:

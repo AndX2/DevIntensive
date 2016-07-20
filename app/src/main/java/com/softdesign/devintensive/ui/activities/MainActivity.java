@@ -35,9 +35,12 @@ import android.view.DragEvent;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +49,7 @@ import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.pojo.UserProfile;
+import com.softdesign.devintensive.ui.adapters.RepoAdapter;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.AndroidDataHelper;
 import com.softdesign.devintensive.utils.ConstantManager;
@@ -86,6 +90,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     int mCurrentEditMode = 0;
     UserProfile mUserProfile;
 
+    @BindView(R.id.repo_list_main)ListView mRepoListView;
+
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout mCoordinatorLayout;
     @BindView(R.id.collapsing_toolbar)
@@ -108,7 +114,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     BottomSheetBehavior mBottomSheetBehavior;
     @BindView(R.id.fab)
     FloatingActionButton mFab;
-    @BindViews({R.id.et_phone, R.id.et_email, R.id.et_vk, R.id.et_git1, R.id.et_myself})
+    @BindViews({R.id.et_phone, R.id.et_email, R.id.et_vk, R.id.et_myself})
     List<EditText> mUserInfo;
     @BindView(R.id.tv_ratio)
     TextView mTVRaiting;
@@ -120,6 +126,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     File mPhotoFile = null;
     private Uri mSelectedImageUri;
+
+    RepoAdapter repoAdapter;
 
     private boolean userPhotoIsChanged = false;
     private boolean userAvatarIsChanged;
@@ -153,17 +161,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             changeEditMode(mCurrentEditMode);
         }
 
-//        loadUserInfoValues();
-
-
-//        Picasso.with(this)
-//                .load(mDataManager.getPreferenceManager().loadUserPhoto())
-//                .into(mUserProfilePhoto);
-
         onOffMaskInput(true);
-        List<User> users = DataManager.getInstance().getDaoSession().getUserDao().loadAll();
-        users.get(3);
-
 
     }
 
@@ -289,7 +287,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    @OnClick({R.id.btn_dial, R.id.btn_sms, R.id.btn_send_email, R.id.btn_view_vk, R.id.btn_view_git})
+    @OnClick({R.id.btn_dial, R.id.btn_sms, R.id.btn_send_email, R.id.btn_view_vk})
     public void actionIntent(ImageView view) {
         if (mCurrentEditMode == 0) {
             switch (view.getId()) {
@@ -305,9 +303,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 case R.id.btn_view_vk:
                     actionView(mUserInfo.get(2).getText().toString());
                     break;
-                case R.id.btn_view_git:
-                    actionView(mUserInfo.get(3).getText().toString());
-                    break;
             }
         }
     }
@@ -322,8 +317,15 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mUserInfo.get(0).setText(user.getContacts().getPhone());
             mUserInfo.get(1).setText(user.getContacts().getEmail());
             mUserInfo.get(2).setText(user.getContacts().getVk());
-            mUserInfo.get(3).setText(user.getRepositories().getRepo().get(0).getGit());
-            mUserInfo.get(4).setText(user.getPublicInfo().getBio());
+            //mUserInfo.get(3).setText(user.getRepositories().getRepo().get(0).getGit());
+            mUserInfo.get(3).setText(user.getPublicInfo().getBio());
+            final List<String> repositories = new ArrayList<>();
+            for (UserProfile.Repo repo: mUserProfile.getData().getUser().getRepositories().getRepo()) {
+                repositories.add(repo.getGit());
+            }
+            repoAdapter = new RepoAdapter(repositories, this);
+            mRepoListView.setAdapter(repoAdapter);
+            setListGitHeight(mRepoListView);
             return true;
 
         }
@@ -335,12 +337,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         if (on) {
             mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("+7(###) ###-##-##"));
             mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("vk.com/*******************"));
-            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("github.com/*******************"));
         } else {
             mUserInfo.get(0).addTextChangedListener(new MaskedWatcher("***************************************"));
             mUserInfo.get(2).addTextChangedListener(new MaskedWatcher("***************************************"));
-            mUserInfo.get(3).addTextChangedListener(new MaskedWatcher("***************************************"));
         }
+        if (repoAdapter != null)repoAdapter.setGitNamesEnabled(on);
 
     }
 
@@ -363,6 +364,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.user_profile_menu:
+                        break;
+                    case R.id.team_menu:
+                        startActivity(new Intent(MainActivity.this, UserListActivity.class));
+                        break;
+                }
                 showSnackbar("Drawer item selected " + item.getTitle());
                 item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
@@ -387,6 +395,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
             ButterKnife.apply(mUserInfo, Enabled, true);
+            if (repoAdapter != null) repoAdapter.setGitNamesEnabled(true);
             mProfilePhotoPlaceholder.setVisibility(VISIBLE);
             mUserInfo.get(0).requestFocus();
             mAppbarParams.setScrollFlags(0);
@@ -398,6 +407,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             }
             //saveUserInfoValues();
             mFab.setImageResource(R.drawable.ic_edit_black_24dp);
+            if (repoAdapter != null)repoAdapter.setGitNamesEnabled(false);
             ButterKnife.apply(mUserInfo, Enabled, false);
             mProfilePhotoPlaceholder.setVisibility(GONE);
             mAppbarParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
@@ -558,8 +568,25 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         } catch (android.content.ActivityNotFoundException ex) {
             showSnackbar(getString(R.string.error_no_email_client));
         }
+    }
 
+    private static void setListGitHeight(ListView listView){
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
 
+        View view = listAdapter.getView(0, null, listView);
+
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+
+        int totalHeight = view.getMeasuredHeight() * listAdapter.getCount();
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 
 
