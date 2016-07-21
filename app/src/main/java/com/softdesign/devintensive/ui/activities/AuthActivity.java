@@ -68,20 +68,11 @@ public class AuthActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
-        super.showProgress();
+        //super.showProgress();
         mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
         if (mUserProfile != null){
             super.showProgress();
-            AsyncExecutor.create().execute(new AsyncExecutor.RunnableEx() {
-                @Override
-                public void run() throws Exception {
-                    Thread thread = Thread.currentThread();
-                    //Delay for show "process" loading if network very fast
-                    thread.sleep(3000);
-                    List<User> userList = loadUserListSync();
-                    EventBus.getDefault().postSticky(new UserListLoadedEvent(userList));
-                }
-            });
+            loadSaveUserListUseBus();
         }else{
             mCardView.setVisibility(View.VISIBLE);
         }
@@ -115,6 +106,21 @@ public class AuthActivity extends BaseActivity {
         }
 
     }
+
+    private void loadSaveUserListUseBus(){
+        AsyncExecutor.create().execute(new AsyncExecutor.RunnableEx() {
+            @Override
+            public void run() throws Exception {
+                Thread thread = Thread.currentThread();
+                //Delay for show "process" loading if network very fast
+                Log.d(TAG, "load and save user list in thread: " + Thread.currentThread().getName());
+                thread.sleep(3000);
+                List<User> userList = loadUserListSync();
+                EventBus.getDefault().postSticky(new UserListLoadedEvent(userList));
+            }
+        });
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUserListLoadedEvent(UserListLoadedEvent event){
@@ -198,7 +204,8 @@ public class AuthActivity extends BaseActivity {
     private void loginSuccess(Response<UserProfile> response) {
         showSnackbar(getString(R.string.enter_success));
         DataManager.getInstance().getPreferenceManager().saveUserProfile(response.body());
-        startMainActivity();
+        mUserProfile = DataManager.getInstance().getPreferenceManager().loadUserProfile();
+        loadSaveUserListUseBus();
     }
 
     private List<User> loadUserListSync(){

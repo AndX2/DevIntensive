@@ -3,6 +3,7 @@ package com.softdesign.devintensive.ui.adapters;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,13 +24,14 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by savos on 16.07.2016.
  */
 
-public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserListViewHolder> {
+public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserListViewHolder> implements ItemTouchHelperAdapter {
 
     static final String TAG = ConstantManager.TAG_USER_LIST_ADAPTER;
 
@@ -116,6 +118,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
         return mUserList.size();
     }
 
+    @Override
+    public void onItemDismiss(int position) {
+        notifyItemRemoved(position);
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        notifyItemMoved(fromPosition, toPosition);
+    }
 
 
 

@@ -8,23 +8,30 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.redmadrobot.chronos.ChronosConnector;
 import com.softdesign.devintensive.DevIntensiveApplication;
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.chronos.ChronosLoadUsersFromDbByName;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
+import com.softdesign.devintensive.ui.adapters.ItemTouchHelperCallback;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
 import com.softdesign.devintensive.ui.customview.RoundImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
@@ -37,8 +44,9 @@ import java.util.List;
  * Created by savos on 16.07.2016.
  */
 
-public class UserListActivity extends BaseActivity {
+public class UserListActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<List<User>> {
     private final String TAG = ConstantManager.TAG_LIST_USER;
+    private final int ID_DB_LOADER = 1917;
 
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
@@ -49,11 +57,15 @@ public class UserListActivity extends BaseActivity {
     private UserListAdapter mUserListAdapter;
     private Handler mHandler;
     NavigationView mNavigationView;
+    private Loader<List<User>> mDbLoader;
+    private ChronosConnector mConnector;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConnector = new ChronosConnector();
+        mConnector.onCreate(this, savedInstanceState);
         setContentView(R.layout.user_list_activity);
 
         mHandler = new Handler();
@@ -66,12 +78,16 @@ public class UserListActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mNavigationView = (NavigationView)findViewById(R.id.list_navigation_view);
 
+
+        mNavigationView = (NavigationView)findViewById(R.id.list_navigation_view);
         setupToolbar();
         setupDrawer();
 
-        loadUsersFromDb();
+        mDbLoader = getSupportLoaderManager().initLoader(ID_DB_LOADER, null, this);
+        mDbLoader.forceLoad();
+
+        //loadUsersFromDb();
     }
 
     @Override
@@ -103,7 +119,8 @@ public class UserListActivity extends BaseActivity {
         Runnable searchUsers = new Runnable() {
             @Override
             public void run() {
-                showUsers(DataManager.getInstance().getStorageManager().getUserListByName(query));
+                mConnector.runOperation(new ChronosLoadUsersFromDbByName(query), false);
+                //showUsers(DataManager.getInstance().getStorageManager().getUserListByName(query));
             }
         };
 
@@ -119,6 +136,24 @@ public class UserListActivity extends BaseActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mConnector.onResume();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mConnector.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        mConnector.onPause();
+        super.onPause();
     }
 
     private void showSnackbar(String message) {
@@ -140,23 +175,24 @@ public class UserListActivity extends BaseActivity {
                         startActivity(profileIntent);
                     }
                 });
+
         mRecyclerView.swapAdapter(mUserListAdapter, false);
+        ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mUserListAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mRecyclerView);
 
     }
 
-
-
-    private void loadUsersFromDb(){
-        try {
-            mUserList = DataManager.getInstance().getStorageManager().getUserListFromDb();
-            Log.d(TAG, "loadUsersFromDb count = " + mUserList.size());
-            showUsers(mUserList);
-        }catch (Exception e){
-            Log.d(TAG, "Error loadUsersFromDb");
-        }
-
-
-    }
+    //TODO: replace action DbLoader
+//    private void loadUsersFromDb(){
+//        try {
+//            mUserList = DataManager.getInstance().getStorageManager().getUserListFromDb();
+//            Log.d(TAG, "loadUsersFromDb count = " + mUserList.size());
+//            showUsers(mUserList);
+//        }catch (Exception e){
+//            Log.d(TAG, "Error loadUsersFromDb");
+//        }
+//    }
 
 
     private void setupToolbar() {
@@ -232,4 +268,33 @@ public class UserListActivity extends BaseActivity {
         }
 
     }
+
+
+    //region=================LoaderManager.LoaderCallbacks========
+
+    @Override
+    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
+
+        return new AsyncTaskLoader<List<User>>(this) {
+            @Override
+            public List<User> loadInBackground() {
+                Log.d(TAG, "loading data from DB in thread: " + Thread.currentThread().getName());
+                return DataManager.getInstance().getStorageManager().getUserListFromDb();
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<User>> loader, List<User> data) {
+        showUsers(data);
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<User>> loader) {
+
+    }
+
+
+    //endregion
 }
