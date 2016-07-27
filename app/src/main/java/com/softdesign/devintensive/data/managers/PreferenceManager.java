@@ -122,4 +122,12 @@ public class PreferenceManager {
 
     }
 
+    public boolean setFirstLauncheFlag(boolean isFirst){
+        boolean tmp = mSharedPreferences.getBoolean(ConstantManager.FIRST_LAUNCHE_FLAG, false);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean(ConstantManager.FIRST_LAUNCHE_FLAG, isFirst);
+        editor.apply();
+        return tmp;
+    }
+
 }

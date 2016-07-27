@@ -1,26 +1,34 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
+import com.vicmikhailau.maskededittext.MaskedWatcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by savos on 16.07.2016.
  */
 
-public class RepoAdapter extends BaseAdapter {
+public class RepoAdapter extends BaseAdapter{
 
     private List<String> mRepositories;
     private Context mContext;
     private LayoutInflater mInflater;
+    private List<EditText> editTexts = new ArrayList<>();
 
     public RepoAdapter(List<String> repositories, Context context) {
         mRepositories = repositories;
@@ -45,7 +53,7 @@ public class RepoAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
 
         View itemView = view;
         if (itemView == null){
@@ -53,6 +61,36 @@ public class RepoAdapter extends BaseAdapter {
         }
         EditText repoName = (EditText) itemView.findViewById(R.id.et_item_git);
         repoName.setText(mRepositories.get(i));
+        editTexts.add(repoName);
+        ImageView btnGit = (ImageView)itemView.findViewById(R.id.btn_item_git);
+        btnGit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String urlString = mRepositories.get(i);
+                if (!urlString.contains("http")) urlString = "https://" + urlString;
+                Uri address = Uri.parse(urlString);
+                Intent openlink = new Intent(Intent.ACTION_VIEW, address);
+                mContext.startActivity(openlink);
+            }
+        });
         return itemView;
     }
+
+    public void setGitNamesEnabled(boolean isEnabled){
+        if(editTexts.isEmpty())return;
+        for (EditText editText:editTexts) {
+            editText.setEnabled(isEnabled);
+            editText.setFocusable(isEnabled);
+            editText.setFocusableInTouchMode(isEnabled);
+            if(isEnabled) {
+                editText.addTextChangedListener(new MaskedWatcher("github.com/*******************"));
+            }else {
+                editText.addTextChangedListener(new MaskedWatcher("***************************************"));
+            }
+        }
+    }
+
+
+
+
 }

@@ -18,6 +18,7 @@ public interface ConstantManager {
     String USER_PROFILE_JSON = "User_key_9";
     String PASS_FINGERPRINT = "pass fingerPrint";
     String USER_PROFILE = "User_key_10";
+    String FIRST_LAUNCHE_FLAG = "first launch flag";
 
     //MainActivity
     String TAG_PREFIX = "Main activity";
@@ -42,4 +43,9 @@ public interface ConstantManager {
 
 
     String PARCEL_USER_KEY = "Parcel userDTO key";
+    String TAG_USER_LIST_ADAPTER = "LogTagUserListAdapter";
+    String TAG_PROFILE_USER = "Profile user activity";
+    String TAG_LIST_USER = "TagUserListActivity";
+    long SEARCH_LATENCY = 5000;
+    long SPLASH_DELAY = 3000;
 }

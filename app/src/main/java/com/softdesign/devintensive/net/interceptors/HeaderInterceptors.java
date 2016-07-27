@@ -23,7 +23,8 @@ public class HeaderInterceptors implements Interceptor {
         Request.Builder requestBuilder = original.newBuilder()
                 .header("X-Access-Token", userProfile.getData().getToken())
                 .header("Request-User-Id", userProfile.getData().getUser().getId())
-                .header("User-Agent", "DevIntensive");
+                .header("User-Agent", "DevIntensive")
+                .header("Cache-control", "max-age=" + (60+60+24));
 
         Request request = requestBuilder.build();
         return chain.proceed(request);

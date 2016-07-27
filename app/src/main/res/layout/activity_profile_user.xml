@@ -3,18 +3,22 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    tools:context=".ui.activities.ProfileUserActivity"
+    >
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            style="@style/toolbar_style"
+            android:fitsSystemWindows="true"
             android:theme="@style/AppTheme.AppBarOverlay"
             >
+
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
@@ -40,7 +44,10 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
                     style="@style/toolbar_style"
+                    android:popupTheme="@style/AppTheme.PopupOverlay"
                     app:layout_collapseMode="pin"/>
 
 

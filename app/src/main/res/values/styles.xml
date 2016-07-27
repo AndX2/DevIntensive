@@ -54,4 +54,8 @@
         <!--<item name="actionMenuTextColor">@color/white</item>-->
     </style>
 
+    <style name="CustomProgressBar" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/custom_progress</item>
+    </style>
+
 </resources>

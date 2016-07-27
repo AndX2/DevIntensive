@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.data.managers;
 
+import com.softdesign.devintensive.DevIntensiveApplication;
+import com.softdesign.devintensive.data.storage.models.DaoSession;
 import com.softdesign.devintensive.net.RestService;
 import com.softdesign.devintensive.net.ServiceGenerator;
 
@@ -12,10 +14,15 @@ public class DataManager {
     private static DataManager instance = null;
     private PreferenceManager mPreferenceManager;
     private NetworkManager mNetworkManager;
+    private StorageManager mStorageManager;
+
+    private DaoSession mDaoSession;
+
 
 
     private DataManager() {
         this.mPreferenceManager = new PreferenceManager();
+        this.mDaoSession = DevIntensiveApplication.getDaoSession();
     }
 
     public static DataManager getInstance() {
@@ -34,5 +41,12 @@ public class DataManager {
         return mNetworkManager;
     }
 
+    public DaoSession getDaoSession() {
+        return mDaoSession;
+    }
 
+    public StorageManager getStorageManager() {
+        if(mStorageManager == null) mStorageManager = StorageManager.getInstance();
+        return mStorageManager;
+    }
 }
